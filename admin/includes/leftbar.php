@@ -25,6 +25,15 @@
 			<li><a href="manage-pages.php"><i class="fa fa-files-o"></i> Manage Pages</a></li>
 			<li><a href="update-contactinfo.php"><i class="fa fa-files-o"></i> Update Contact Info</a></li>
 
+            <!-- Start: Blog Management Links -->
+            <li><a href="#"><i class="fa fa-newspaper-o"></i> Blog Management</a>
+                <ul>
+                    <li><a href="post-blog.php">Post New Article</a></li>
+                    <li><a href="manage-blogposts.php">Manage Blog Posts</a></li>
+                </ul>
+            </li>
+            <!-- End: Blog Management Links -->
+
 			<li><a href="manage-subscribers.php"><i class="fa fa-table"></i> Manage Subscribers</a></li>
 
 			</ul>

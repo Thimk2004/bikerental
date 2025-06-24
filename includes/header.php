@@ -97,7 +97,7 @@ foreach($results as $result)
 
           <li><a href="page.php?type=aboutus">About Us</a></li>
           <li><a href="bike-listing.php">Bike Listing</a>
-          <li><a href="page.php?type=faqs">FAQs</a></li>
+          <li><a href="page.php?type=blog">Blog</a></li>
           <li><a href="contact-us.php">Contact Us</a></li>
 
         </ul>

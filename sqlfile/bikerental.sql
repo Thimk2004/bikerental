@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 4.4.14
--- http://www.phpmyadmin.net
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 28, 2017 at 07:57 PM
--- Server version: 5.6.26
--- PHP Version: 5.5.28
+-- Generation Time: Jun 24, 2025 at 02:02 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -26,12 +27,12 @@ SET time_zone = "+00:00";
 -- Table structure for table `admin`
 --
 
-CREATE TABLE IF NOT EXISTS `admin` (
+CREATE TABLE `admin` (
   `id` int(11) NOT NULL,
   `UserName` varchar(100) NOT NULL,
   `Password` varchar(100) NOT NULL,
-  `updationDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+  `updationDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `admin`
@@ -43,10 +44,34 @@ INSERT INTO `admin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblblogposts`
+--
+
+CREATE TABLE `tblblogposts` (
+  `id` int(11) NOT NULL COMMENT 'unique identifier',
+  `PostTitle` varchar(255) NOT NULL COMMENT 'blog title',
+  `PostContent` text NOT NULL COMMENT 'Blog post details',
+  `PostImage` varchar(255) NOT NULL COMMENT 'Article cover image path (optional)',
+  `Author` varchar(100) NOT NULL COMMENT 'Author (optional)',
+  `PostingDate` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Release date',
+  `LastUpdated` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'Last updated date (optional)',
+  `Slug` varchar(255) NOT NULL COMMENT 'Friendly name to use for the URL (optional, but recommended)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblblogposts`
+--
+
+INSERT INTO `tblblogposts` (`id`, `PostTitle`, `PostContent`, `PostImage`, `Author`, `PostingDate`, `LastUpdated`, `Slug`) VALUES
+(2, 'Text Post', 'test post', 'c83533a95d6dd79d5bae5759f34bff87.jpg', 'Ben', '2025-06-23 23:33:37', NULL, '');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblbooking`
 --
 
-CREATE TABLE IF NOT EXISTS `tblbooking` (
+CREATE TABLE `tblbooking` (
   `id` int(11) NOT NULL,
   `userEmail` varchar(100) DEFAULT NULL,
   `VehicleId` int(11) DEFAULT NULL,
@@ -54,8 +79,8 @@ CREATE TABLE IF NOT EXISTS `tblbooking` (
   `ToDate` varchar(20) DEFAULT NULL,
   `message` varchar(255) DEFAULT NULL,
   `Status` int(11) DEFAULT NULL,
-  `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+  `PostingDate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblbooking`
@@ -72,12 +97,12 @@ INSERT INTO `tblbooking` (`id`, `userEmail`, `VehicleId`, `FromDate`, `ToDate`, 
 -- Table structure for table `tblbrands`
 --
 
-CREATE TABLE IF NOT EXISTS `tblbrands` (
+CREATE TABLE `tblbrands` (
   `id` int(11) NOT NULL,
   `BrandName` varchar(120) NOT NULL,
-  `CreationDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+  `CreationDate` timestamp NULL DEFAULT current_timestamp(),
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblbrands`
@@ -97,12 +122,12 @@ INSERT INTO `tblbrands` (`id`, `BrandName`, `CreationDate`, `UpdationDate`) VALU
 -- Table structure for table `tblcontactusinfo`
 --
 
-CREATE TABLE IF NOT EXISTS `tblcontactusinfo` (
+CREATE TABLE `tblcontactusinfo` (
   `id` int(11) NOT NULL,
-  `Address` tinytext,
+  `Address` tinytext DEFAULT NULL,
   `EmailId` varchar(255) DEFAULT NULL,
   `ContactNo` char(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblcontactusinfo`
@@ -117,22 +142,22 @@ INSERT INTO `tblcontactusinfo` (`id`, `Address`, `EmailId`, `ContactNo`) VALUES
 -- Table structure for table `tblcontactusquery`
 --
 
-CREATE TABLE IF NOT EXISTS `tblcontactusquery` (
+CREATE TABLE `tblcontactusquery` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `EmailId` varchar(120) DEFAULT NULL,
   `ContactNumber` char(11) DEFAULT NULL,
-  `Message` longtext,
-  `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Message` longtext DEFAULT NULL,
+  `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `status` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblcontactusquery`
 --
 
 INSERT INTO `tblcontactusquery` (`id`, `name`, `EmailId`, `ContactNumber`, `Message`, `PostingDate`, `status`) VALUES
-(1, 'Harry Den', 'webhostingamigo@gmail.com', '2147483647', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry''s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum', '2017-06-18 10:03:07', 1);
+(1, 'Harry Den', 'webhostingamigo@gmail.com', '2147483647', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum', '2017-06-18 10:03:07', 1);
 
 -- --------------------------------------------------------
 
@@ -140,43 +165,22 @@ INSERT INTO `tblcontactusquery` (`id`, `name`, `EmailId`, `ContactNumber`, `Mess
 -- Table structure for table `tblpages`
 --
 
-CREATE TABLE IF NOT EXISTS `tblpages` (
+CREATE TABLE `tblpages` (
   `id` int(11) NOT NULL,
   `PageName` varchar(255) DEFAULT NULL,
   `type` varchar(255) NOT NULL DEFAULT '',
   `detail` longtext NOT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblpages`
 --
 
 INSERT INTO `tblpages` (`id`, `PageName`, `type`, `detail`) VALUES
-(1, 'Terms and Conditions', 'terms', '<P align=justify><FONT size=2><STRONG><FONT color=#990000>(1) ACCEPTANCE OF TERMS</FONT><BR><BR></STRONG>Last updated: December 05, 2017
-Please read these Terms and Conditions ("Terms", "Terms and Conditions") carefully before using the ->code-projects.org/ website (the "Service") operated by Code Projects ("us", "we", or "our").
-Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.
-By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service. Terms and Conditions from TermsFeed for Code Projects. Links To Other Web Sites
-Our Service may contain links to third-party web sites or services that are not owned or controlled by Code Projects.
-Code Projects has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that Code Projects shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.
-We strongly advise you to read the terms and conditions and privacy policies of any third-party web sites or services that you visit. Governing Law
-These Terms shall be governed and construed in accordance with the laws of New York, United States, without regard to its conflict of law provisions.
-Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service. Changes
-We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
-By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Service. Contact Us
-If you have any questions about these Terms, please contact us. </FONT></P>'),
-(2, 'Privacy Policy', 'privacy', '<span style="color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat</span>'),
-(3, 'About Us ', 'aboutus', '<span style="color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; text-align: justify;">WE ARE THE BIKE RENTAL MANAGER. The only 100% dedicated bike rental booking website. The first Bike Rental Manager (BRM) shop was our own bike shop. Ever Since it has been our aim to make bike rental easier for everyone, everywhere.We focus on making bike rentals easier for you.Your rental business has a unique set of challenges. We are the only dedicated bike rental site and will be able to offer you a solution to match your needs.Get in touch with us today! We provide affordable bike rates, we hae lost of Satiisfied customers feedback, you can have a look at our home page too!! </span>'),
-(11, 'FAQs', 'faqs', '																														<span style="color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;">How do I use discounts coupons?
-Except for promotion codes, Our discounts are applied automatically if your reservation meets any of the criteria mentioned above.
-
-To use a promotion code, simply enter the code on the homepage widget as you start your reservation. You can do this by selecting the "Have a promotion code?" prompt. Promotion codes can also be entered on the checkout page, under Reservation Total. Please note that the promotion code prompt does not appear for certain types of reservations, such as reservations made on the Deals page.
-<br>
-Our Discounts Terms & Conditions
-We no longer offer or accept returning customer discounts. All discounts are non-transferable and cannot be combined with additional promotions or discounts.</br>
-
-* Liability in case accident:
-The hirer should have coverage through his own accident and liability insurance.
-The renting company is not responsible under any circumstances for accidents or damages caused to the hirer or which the hirer causes to any third party or cases of liability </span>');
+(1, 'Terms and Conditions', 'terms', '<P align=justify><FONT size=2><STRONG><FONT color=#990000>(1) ACCEPTANCE OF TERMS</FONT><BR><BR></STRONG>Last updated: December 05, 2017\r\nPlease read these Terms and Conditions (\"Terms\", \"Terms and Conditions\") carefully before using the ->code-projects.org/ website (the \"Service\") operated by Code Projects (\"us\", \"we\", or \"our\").\r\nYour access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.\r\nBy accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service. Terms and Conditions from TermsFeed for Code Projects. Links To Other Web Sites\r\nOur Service may contain links to third-party web sites or services that are not owned or controlled by Code Projects.\r\nCode Projects has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that Code Projects shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.\r\nWe strongly advise you to read the terms and conditions and privacy policies of any third-party web sites or services that you visit. Governing Law\r\nThese Terms shall be governed and construed in accordance with the laws of New York, United States, without regard to its conflict of law provisions.\r\nOur failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service. Changes\r\nWe reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.\r\nBy continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Service. Contact Us\r\nIf you have any questions about these Terms, please contact us. </FONT></P>'),
+(2, 'Privacy Policy', 'privacy', '<span style=\"color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat</span>'),
+(3, 'About Us ', 'aboutus', 'Welcome to A+ motobike platform! We are an online platform specifically designed for motorcycle enthusiasts, dedicated to providing a safe, reliable, and convenient marketplace for used motorcycles, parts, and gear.\r\n\r\nAs fellow members of the motorcycle community, we understand that finding the perfect ride, sourcing the right parts, or upgrading your equipment requires both specialized knowledge and, crucially, trust. That\'\'s why we created A+ motobike platform – to address these very needs for riders everywhere.\r\n\r\nOur Mission\r\nOur mission is to build a vibrant motorcycle trading ecosystem where every user can easily:\r\nDiscover: From classic vintage bikes to the latest models, from OEM parts to aftermarket accessories, and from essential safety gear to stylish riding apparel, you\'ll find what you\'re looking for here.\r\nSell: Safely and efficiently connect your beloved bike, spare parts, or unused gear with its next owner, ensuring nothing goes to waste.\r\nConnect: More than just a marketplace, we aim to be a central hub for motorcycle enthusiasts to share insights, exchange experiences, and build lasting connections.\r\n\r\nWhy Choose Us?\r\nFocused & Expert: We specialize exclusively in the motorcycle domain, understanding its unique characteristics and committing to provide services tailored precisely to the needs of riders.\r\nSeamless User Experience: Our intuitive website design and powerful search functions make Browse effortless and finding what you need quick and easy.\r\nDiverse Product Selection: Whether you\'re searching for a complete bike, engine components, tires, braking systems, or gear like helmets, gloves, and protective jackets, you\'ll find an extensive selection here.\r\nWe believe every motorcycle has a unique story, and every part carries a rider\'s passion. At A+ motobike platform, we hope to help these stories and passions continue\'.\r\n\r\nJoin us and experience the limitless thrill of the motorcycle world!'),
+(11, 'FAQs', 'faqs', '																														<span style=\"color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">How do I use discounts coupons?\r\nExcept for promotion codes, Our discounts are applied automatically if your reservation meets any of the criteria mentioned above.\r\n\r\nTo use a promotion code, simply enter the code on the homepage widget as you start your reservation. You can do this by selecting the \"Have a promotion code?\" prompt. Promotion codes can also be entered on the checkout page, under Reservation Total. Please note that the promotion code prompt does not appear for certain types of reservations, such as reservations made on the Deals page.\r\n<br>\r\nOur Discounts Terms & Conditions\r\nWe no longer offer or accept returning customer discounts. All discounts are non-transferable and cannot be combined with additional promotions or discounts.</br>\r\n\r\n* Liability in case accident:\r\nThe hirer should have coverage through his own accident and liability insurance.\r\nThe renting company is not responsible under any circumstances for accidents or damages caused to the hirer or which the hirer causes to any third party or cases of liability </span>');
 
 -- --------------------------------------------------------
 
@@ -184,11 +188,11 @@ The renting company is not responsible under any circumstances for accidents or 
 -- Table structure for table `tblsubscribers`
 --
 
-CREATE TABLE IF NOT EXISTS `tblsubscribers` (
+CREATE TABLE `tblsubscribers` (
   `id` int(11) NOT NULL,
   `SubscriberEmail` varchar(120) DEFAULT NULL,
-  `PostingDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+  `PostingDate` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblsubscribers`
@@ -203,13 +207,13 @@ INSERT INTO `tblsubscribers` (`id`, `SubscriberEmail`, `PostingDate`) VALUES
 -- Table structure for table `tbltestimonial`
 --
 
-CREATE TABLE IF NOT EXISTS `tbltestimonial` (
+CREATE TABLE `tbltestimonial` (
   `id` int(11) NOT NULL,
   `UserEmail` varchar(100) NOT NULL,
   `Testimonial` mediumtext NOT NULL,
-  `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `status` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tbltestimonial`
@@ -225,7 +229,7 @@ INSERT INTO `tbltestimonial` (`id`, `UserEmail`, `Testimonial`, `PostingDate`, `
 -- Table structure for table `tblusers`
 --
 
-CREATE TABLE IF NOT EXISTS `tblusers` (
+CREATE TABLE `tblusers` (
   `id` int(11) NOT NULL,
   `FullName` varchar(120) DEFAULT NULL,
   `EmailId` varchar(100) DEFAULT NULL,
@@ -235,9 +239,9 @@ CREATE TABLE IF NOT EXISTS `tblusers` (
   `Address` varchar(255) DEFAULT NULL,
   `City` varchar(100) DEFAULT NULL,
   `Country` varchar(100) DEFAULT NULL,
-  `RegDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+  `RegDate` timestamp NULL DEFAULT current_timestamp(),
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblusers`
@@ -255,11 +259,11 @@ INSERT INTO `tblusers` (`id`, `FullName`, `EmailId`, `Password`, `ContactNo`, `d
 -- Table structure for table `tblvehicles`
 --
 
-CREATE TABLE IF NOT EXISTS `tblvehicles` (
+CREATE TABLE `tblvehicles` (
   `id` int(11) NOT NULL,
   `VehiclesTitle` varchar(150) DEFAULT NULL,
   `VehiclesBrand` int(11) DEFAULT NULL,
-  `VehiclesOverview` longtext,
+  `VehiclesOverview` longtext DEFAULT NULL,
   `PricePerDay` int(11) DEFAULT NULL,
   `FuelType` varchar(100) DEFAULT NULL,
   `ModelYear` int(6) DEFAULT NULL,
@@ -281,9 +285,9 @@ CREATE TABLE IF NOT EXISTS `tblvehicles` (
   `CentralLocking` int(11) DEFAULT NULL,
   `CrashSensor` int(11) DEFAULT NULL,
   `LeatherSeats` int(11) DEFAULT NULL,
-  `RegDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `RegDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tblvehicles`
@@ -304,6 +308,12 @@ INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `VehiclesOver
 -- Indexes for table `admin`
 --
 ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tblblogposts`
+--
+ALTER TABLE `tblblogposts`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -368,52 +378,69 @@ ALTER TABLE `tblvehicles`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tblblogposts`
+--
+ALTER TABLE `tblblogposts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'unique identifier', AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `tblbooking`
 --
 ALTER TABLE `tblbooking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `tblbrands`
 --
 ALTER TABLE `tblbrands`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
 --
 -- AUTO_INCREMENT for table `tblcontactusinfo`
 --
 ALTER TABLE `tblcontactusinfo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `tblcontactusquery`
 --
 ALTER TABLE `tblcontactusquery`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `tblpages`
 --
 ALTER TABLE `tblpages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
 --
 -- AUTO_INCREMENT for table `tblsubscribers`
 --
 ALTER TABLE `tblsubscribers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `tbltestimonial`
 --
 ALTER TABLE `tbltestimonial`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `tblusers`
 --
 ALTER TABLE `tblusers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
 --
 -- AUTO_INCREMENT for table `tblvehicles`
 --
 ALTER TABLE `tblvehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

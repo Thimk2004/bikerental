@@ -94,9 +94,13 @@ foreach($results as $result)
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="nav navbar-nav">
           <li><a href="index.php">Home</a>    </li>
-
           <li><a href="page.php?type=aboutus">About Us</a></li>
-          <li><a href="bike-listing.php">Bike Listing</a>
+          <li class="dropdown"><a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">MARKET <i aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="bike-listing.php">Bike Listing</a></li>
+              <li><a href="accessories.php">Accessories</a></li>
+            </ul>
+          </li>
           <li><a href="page.php?type=blog">Blog</a></li>
           <li><a href="contact-us.php">Contact Us</a></li>
 

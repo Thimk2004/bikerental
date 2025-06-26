@@ -30,16 +30,21 @@ $centrallocking=$_POST['centrallocking'];
 $crashcensor=$_POST['crashcensor'];
 $leatherseats=$_POST['leatherseats'];
 $id=intval($_GET['id']);
+//New Add code for bike type
+$biketype=$_POST['biketype'];
+$transactioncount=isset($_POST['transactioncount']) ? intval($_POST['transactioncount']) : 0;
 
 $sql="update tblvehicles set VehiclesTitle=:vehicletitle,VehiclesBrand=:brand,VehiclesOverview=:vehicleoverview,PricePerDay=:priceperday,FuelType=:fueltype,ModelYear=:modelyear,SeatingCapacity=:seatingcapacity,AirConditioner=:airconditioner,PowerDoorLocks=:powerdoorlocks,AntiLockBrakingSystem=:antilockbrakingsys,BrakeAssist=:brakeassist,PowerSteering=:powersteering,DriverAirbag=:driverairbag,PassengerAirbag=:passengerairbag,PowerWindows=:powerwindow,CDPlayer=:cdplayer,CentralLocking=:centrallocking,CrashSensor=:crashcensor,LeatherSeats=:leatherseats where id=:id ";
 $query = $dbh->prepare($sql);
 $query->bindParam(':vehicletitle',$vehicletitle,PDO::PARAM_STR);
 $query->bindParam(':brand',$brand,PDO::PARAM_STR);
+$query->bindParam(':biketype',$biketype,PDO::PARAM_STR); // 新增這行
 $query->bindParam(':vehicleoverview',$vehicleoverview,PDO::PARAM_STR);
 $query->bindParam(':priceperday',$priceperday,PDO::PARAM_STR);
 $query->bindParam(':fueltype',$fueltype,PDO::PARAM_STR);
 $query->bindParam(':modelyear',$modelyear,PDO::PARAM_STR);
 $query->bindParam(':seatingcapacity',$seatingcapacity,PDO::PARAM_STR);
+$query->bindParam(':transactioncount',$transactioncount,PDO::PARAM_INT); // 新增這行
 $query->bindParam(':airconditioner',$airconditioner,PDO::PARAM_STR);
 $query->bindParam(':powerdoorlocks',$powerdoorlocks,PDO::PARAM_STR);
 $query->bindParam(':antilockbrakingsys',$antilockbrakingsys,PDO::PARAM_STR);
@@ -182,22 +187,37 @@ continue;
 </div>
 
 <div class="form-group">
-<label class="col-sm-2 control-label">Price Per Day(in USD)<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<input type="text" name="priceperday" class="form-control" value="<?php echo htmlentities($result->PricePerDay);?>" required>
+    <label class="col-sm-2 control-label">Price (HKD)<span style="color:red">*</span></label>
+    <div class="col-sm-4">
+        <input type="number" name="priceperday" class="form-control" value="<?php echo htmlentities($result->PricePerDay);?>" required>
+    </div>
+    <label class="col-sm-2 control-label">Select motorcycle type<span style="color:red">*</span></label>
+    <div class="col-sm-4">
+        <select class="selectpicker" name="biketype" required>
+            <option value="<?php echo htmlentities($result->BikeType);?>"><?php echo htmlentities($result->BikeType);?> </option>
+            <?php
+            // 定義所有電單車類型
+            $bike_types = ['Naked', 'Cruiser', 'Sports', 'Touring', 'Off-road', 'Scooter', 'Electric motorcycle'];
+            foreach ($bike_types as $type) {
+                if($type == $result->BikeType) continue; // 跳過當前類型，因為它已經被選中
+            ?>
+            <option value="<?php echo htmlentities($type);?>"><?php echo htmlentities($type);?></option>
+            <?php } ?>
+        </select>
+    </div>
 </div>
-<label class="col-sm-2 control-label">Select Fuel Type<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<select class="selectpicker" name="fueltype" required>
-<option value="<?php echo htmlentities($results->FuelType);?>"> <?php echo htmlentities($result->FuelType);?> </option>
 
-<option value="Petrol">Petrol</option>
-<option value="Diesel">Diesel</option>
-<option value="CNG">CNG</option>
-</select>
+<div class="form-group">
+    <label class="col-sm-2 control-label">Select Fuel Type<span style="color:red">*</span></label>
+    <div class="col-sm-4">
+        <select class="selectpicker" name="fueltype" required>
+            <option value="<?php echo htmlentities($result->FuelType);?>"> <?php echo htmlentities($result->FuelType);?> </option>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Electric">Electric</option> <!-- 考慮為電動車添加選項 -->
+        </select>
+    </div>
 </div>
-</div>
-
 
 <div class="form-group">
 <label class="col-sm-2 control-label">Model Year<span style="color:red">*</span></label>
@@ -215,6 +235,14 @@ continue;
 <h4><b>Vehicle Images</b></h4>
 </div>
 </div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Hand of transactions</label>
+    <div class="col-sm-4">
+        <input type="number" name="transactioncount" class="form-control" value="<?php echo htmlentities($result->TransactionCount);?>" min="0">
+    </div>
+</div>
+<div class="hr-dashed"></div>
 
 
 <div class="form-group">

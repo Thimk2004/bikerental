@@ -1,7 +1,123 @@
 <?php
 session_start();
-include('includes/config.php');
 error_reporting(0);
+include('includes/config.php');
+
+// 定義可用的排序選項
+$sort_options = [
+    'default' => 'Best Match',
+    'recent' => 'Recent', // 使用 RegDate (註冊日期) 作為最近發佈的依據
+    'price_high_to_low' => 'Price - High to Low',
+    'price_low_to_high' => 'Price - Low to High',
+    'transaction_low_to_high' => 'Transaction Count - Low to High',
+    'transaction_high_to_low' => 'Transaction Count - High to Low'
+];
+
+// 定義電單車類型
+$bike_types = ['Naked', 'Cruiser', 'Sports', 'Touring', 'Off-road', 'Scooter', 'Electric motorcycle'];
+
+// 從數據庫獲取品牌列表
+$brands_from_db = [];
+$ret_brands = "SELECT id, BrandName FROM tblbrands ORDER BY BrandName ASC";
+$query_brands = $dbh->prepare($ret_brands);
+$query_brands->execute();
+$result_brands = $query_brands->fetchAll(PDO::FETCH_OBJ);
+if ($query_brands->rowCount() > 0) {
+    foreach ($result_brands as $brand) {
+        $brands_from_db[$brand->id] = $brand->BrandName; // 儲存為 ID => Name 的映射
+    }
+}
+
+// 初始化篩選變量，從 GET 參數獲取
+$selected_sort = isset($_GET['sort']) && array_key_exists($_GET['sort'], $sort_options) ? $_GET['sort'] : 'default';
+$selected_type = isset($_GET['type']) && in_array($_GET['type'], $bike_types) ? $_GET['type'] : '';
+$selected_brand_id = isset($_GET['brand']) ? intval($_GET['brand']) : ''; // 使用品牌 ID 進行篩選
+$selected_model_year = isset($_GET['modelyear']) ? intval($_GET['modelyear']) : '';
+$min_price = isset($_GET['min_price']) ? intval($_GET['min_price']) : '';
+$max_price = isset($_GET['max_price']) ? intval($_GET['max_price']) : '';
+$transaction_count_range = isset($_GET['transaction_count_range']) ? $_GET['transaction_count_range'] : '';
+
+
+// 構建 SQL 查詢基礎
+$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE 1";
+$params = []; // 用於 PDO 綁定參數
+
+// 應用篩選條件
+if (!empty($selected_type)) {
+    $sql .= " AND tv.BikeType = :biketype";
+    $params[':biketype'] = $selected_type;
+}
+if (!empty($selected_brand_id)) {
+    $sql .= " AND tv.VehiclesBrand = :brand_id";
+    $params[':brand_id'] = $selected_brand_id;
+}
+if (!empty($selected_model_year)) {
+    $sql .= " AND tv.ModelYear = :modelyear";
+    $params[':modelyear'] = $selected_model_year;
+}
+if ($min_price !== '') { // 允許 0 作為有效最低價格
+    $sql .= " AND tv.PricePerDay >= :minprice";
+    $params[':minprice'] = $min_price;
+}
+if ($max_price !== '') { // 允許 0 作為有效最高價格
+    $sql .= " AND tv.PricePerDay <= :maxprice";
+    $params[':maxprice'] = $max_price;
+}
+// 交易次數篩選 (根據 TransactionCount 字段)
+if (!empty($transaction_count_range)) {
+    if ($transaction_count_range === '0-0') {
+        $sql .= " AND tv.TransactionCount = 0";
+    } elseif ($transaction_count_range === '11-over') { // 假設 11+ 為一個範圍
+        $sql .= " AND tv.TransactionCount >= 11";
+    } else {
+        list($min_tx, $max_tx) = explode('-', $transaction_count_range);
+        $sql .= " AND tv.TransactionCount BETWEEN :mintx AND :maxtx";
+        $params[':mintx'] = intval($min_tx);
+        $params[':maxtx'] = intval($max_tx);
+    }
+}
+
+// 添加排序
+switch ($selected_sort) {
+    case 'recent':
+        $sql .= " ORDER BY tv.RegDate DESC"; // 假設 'RegDate' 是記錄創建日期
+        break;
+    case 'price_high_to_low':
+        $sql .= " ORDER BY tv.PricePerDay DESC";
+        break;
+    case 'price_low_to_high':
+        $sql .= " ORDER BY tv.PricePerDay ASC";
+        break;
+    case 'transaction_low_to_high':
+        $sql .= " ORDER BY tv.TransactionCount ASC";
+        break;
+    case 'transaction_high_to_low':
+        $sql .= " ORDER BY tv.TransactionCount DESC";
+        break;
+    case 'default':
+    default:
+        $sql .= " ORDER BY tv.id DESC"; // 預設按 ID 降序 (最新)
+        break;
+}
+
+$query = $dbh->prepare($sql);
+// 綁定參數，根據類型選擇 PDO::PARAM_INT 或 PDO::PARAM_STR
+foreach ($params as $key => $val) {
+    $query->bindParam($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+$query->execute();
+$vehicles = $query->fetchAll(PDO::FETCH_OBJ);
+
+// 從數據庫獲取所有獨特的型號年份，用於篩選下拉菜單
+$model_years = [];
+$ret_years = "SELECT DISTINCT ModelYear FROM tblvehicles ORDER BY ModelYear DESC";
+$query_years = $dbh->prepare($ret_years);
+$query_years->execute();
+$result_years = $query_years->fetchAll(PDO::FETCH_OBJ);
+foreach ($result_years as $year) {
+    $model_years[] = $year->ModelYear;
+}
+
 ?>
 
 <!DOCTYPE HTML>
@@ -12,7 +128,7 @@ error_reporting(0);
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="keywords" content="">
 <meta name="description" content="">
-<title>Bike Rental Portal | Bike Listing</title>
+<title>Bike Rental Portal | Market Listings</title>
 <!--Bootstrap -->
 <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
 <!--Custome Style -->
@@ -28,13 +144,13 @@ error_reporting(0);
 <link href="assets/css/font-awesome.min.css" rel="stylesheet">
 
 <!-- SWITCHER -->
-		<link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all" data-default-color="true" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/pink.css" title="pink" media="all" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/green.css" title="green" media="all" />
-		<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/purple.css" title="purple" media="all" />
+<link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all" data-default-color="true" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/pink.css" title="pink" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/green.css" title="green" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/purple.css" title="purple" media="all" />
 
 <!-- Fav and touch icons -->
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">
@@ -43,9 +159,130 @@ error_reporting(0);
 <link rel="apple-touch-icon-precomposed" href="assets/images/favicon-icon/apple-touch-icon-57-precomposed.png">
 <link rel="shortcut icon" href="assets/images/favicon-icon/24x24.png">
 <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+
+<style>
+/* 自定義樣式，用於網格佈局和篩選器 */
+.listing-section {
+    padding: 30px 0;
+}
+.filter-sidebar {
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px; /* 在手機上顯示間距 */
+}
+.filter-sidebar h5 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.filter-sidebar .form-group {
+    margin-bottom: 15px;
+}
+.filter-sidebar label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+.filter-sidebar select,
+.filter-sidebar input[type="text"],
+.filter-sidebar input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* 將 padding 和 border 包含在寬度內 */
+}
+.filter-sidebar .btn-block {
+    margin-top: 20px;
+}
+
+.bike-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* 卡片之間的間距 */
+    justify-content: flex-start;
+}
+.bike-item-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+    width: calc(33.33% - 20px); /* 3 列佈局，減去間距 */
+    box-sizing: border-box;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+.bike-item-card:hover {
+    transform: translateY(-5px);
+}
+.bike-item-card img {
+    width: 100%;
+    height: 200px; /* 圖片固定高度 */
+    object-fit: cover; /* 覆蓋區域，必要時裁剪 */
+}
+.bike-item-content {
+    padding: 15px;
+    flex-grow: 1; /* 允許內容區域擴展 */
+    display: flex;
+    flex-direction: column;
+}
+.bike-item-content h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.3em;
+    color: #333;
+}
+.bike-item-content p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
+}
+.bike-item-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff; /* 或你的品牌顏色 */
+    margin-top: auto; /* 將價格推到底部 */
+    text-align: right;
+}
+.bike-item-link {
+    display: block;
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+.bike-item-link:hover {
+    background-color: #0056b3;
+}
+
+/* 響應式調整 */
+@media (max-width: 992px) {
+    .bike-item-card {
+        width: calc(50% - 20px); /* 在中等屏幕上顯示 2 列 */
+    }
+}
+@media (max-width: 768px) {
+    .filter-sidebar {
+        margin-right: 0; /* 在小屏幕上全寬顯示 */
+    }
+    .bike-item-card {
+        width: 100%; /* 在小屏幕上顯示 1 列 */
+    }
+}
+</style>
 </head>
 <body>
-
 <!-- Start Switcher -->
 <?php include('includes/colorswitcher.php');?>
 <!-- /Switcher -->
@@ -54,171 +291,169 @@ error_reporting(0);
 <?php include('includes/header.php');?>
 <!-- /Header -->
 
-<!--Page Header-->
+<!-- 頁面標頭 (你可以進一步自定義) -->
 <section class="page-header listing_page">
   <div class="container">
     <div class="page-header_wrap">
       <div class="page-heading">
-        <h1>Bike Listing</h1>
+        <h1>電單車市場</h1>
       </div>
       <ul class="coustom-breadcrumb">
-        <li><a href="#">Home</a></li>
-        <li>Bike Listing</li>
+        <li><a href="#">首頁</a></li>
+        <li>電單車市場</li>
       </ul>
     </div>
   </div>
-  <!-- Dark Overlay-->
+  <!-- 黑色疊層 -->
   <div class="dark-overlay"></div>
 </section>
-<!-- /Page Header-->
+<!-- /頁面標頭 -->
 
-<!--Listing-->
-<section class="listing-page">
+<!-- 列表區塊 -->
+<section class="listing-section">
   <div class="container">
     <div class="row">
-      <div class="col-md-9 col-md-push-3">
-        <div class="result-sorting-wrapper">
-          <div class="sorting-count">
-<?php
-#echo("1");
-//Query for Listing count
-$sql = "SELECT id from tblvehicles";
-#echo($sql);
-$query = $dbh -> prepare($sql);
-/*
-$query->bindParam(':vhid',$vhid, PDO::PARAM_STR);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-*/
-$cnt=$query->rowCount();
-?>
-<p><span><?php echo htmlentities($cnt);?> Listings</span></p>
-</div>
-</div>
 
-<?php $sql = "SELECT tblvehicles.*,tblbrands.BrandName,tblbrands.id as bid  from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{  ?>
-        <div class="product-listing-m gray-bg">
-          <div class="product-listing-img"><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1);?>" class="img-responsive" alt="Image" /> </a>
-          </div>
-          <div class="product-listing-content">
-            <h5><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a></h5>
-            <p class="list-price">$<?php echo htmlentities($result->PricePerDay);?> Per Day</p>
-            <ul>
-              <li><i class="fa fa-user" aria-hidden="true"></i><?php echo htmlentities($result->SeatingCapacity);?> seats</li>
-              <li><i class="fa fa-calendar" aria-hidden="true"></i><?php echo htmlentities($result->ModelYear);?> model</li>
-              <li><i class="fa fa-motorcycle" aria-hidden="true"></i><?php echo htmlentities($result->FuelType);?></li>
-            </ul>
-            <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>" class="btn">View Details <span class="angle_arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></span></a>
-          </div>
+      <!-- 篩選側邊欄 -->
+      <div class="col-md-3 col-sm-4">
+        <div class="filter-sidebar">
+          <form action="bike-listing.php" method="get">
+            <h5>篩選器</h5>
+
+            <div class="form-group">
+              <label for="sort_by">排序方式:</label>
+              <select class="form-control" id="sort_by" name="sort" onchange="this.form.submit()">
+                <?php foreach ($sort_options as $key => $value) { ?>
+                  <option value="<?php echo htmlentities($key); ?>" <?php if ($selected_sort == $key) echo 'selected'; ?>>
+                    <?php echo htmlentities($value); ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bike_type">電單車類型:</label>
+              <select class="form-control" id="bike_type" name="type" onchange="this.form.submit()">
+                <option value="">選擇類型</option>
+                <?php foreach ($bike_types as $type) { ?>
+                  <option value="<?php echo htmlentities($type); ?>" <?php if ($selected_type == $type) echo 'selected'; ?>>
+                    <?php echo htmlentities($type); ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="brand_name">品牌:</label>
+              <select class="form-control" id="brand_name" name="brand" onchange="this.form.submit()">
+                <option value="">選擇品牌</option>
+                <?php foreach ($result_brands as $brand_obj) { ?>
+                  <option value="<?php echo htmlentities($brand_obj->id); ?>" <?php if ($selected_brand_id == $brand_obj->id) echo 'selected'; ?>>
+                    <?php echo htmlentities($brand_obj->BrandName); ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="model_year">年份:</label>
+              <select class="form-control" id="model_year" name="modelyear" onchange="this.form.submit()">
+                <option value="">選擇年份</option>
+                <?php foreach ($model_years as $year) { ?>
+                  <option value="<?php echo htmlentities($year); ?>" <?php if ($selected_model_year == $year) echo 'selected'; ?>>
+                    <?php echo htmlentities($year); ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="transaction_count_range">交易次數:</label>
+              <select class="form-control" id="transaction_count_range" name="transaction_count_range" onchange="this.form.submit()">
+                <option value="">選擇範圍</option>
+                <option value="0-0" <?php if ($transaction_count_range == '0-0') echo 'selected'; ?>>0 次交易</option>
+                <option value="1-5" <?php if ($transaction_count_range == '1-5') echo 'selected'; ?>>1-5 次交易</option>
+                <option value="6-10" <?php if ($transaction_count_range == '6-10') echo 'selected'; ?>>6-10 次交易</option>
+                <option value="11-over" <?php if ($transaction_count_range == '11-over') echo 'selected'; ?>>11+ 次交易</option>
+                <!-- 可根據需要添加更多範圍 -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="min_price">預算 (HKD):</label>
+              <input type="number" class="form-control" id="min_price" name="min_price" placeholder="最低價格" value="<?php echo htmlentities($min_price); ?>">
+            </div>
+            <div class="form-group">
+              <input type="number" class="form-control" id="max_price" name="max_price" placeholder="最高價格" value="<?php echo htmlentities($max_price); ?>">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">應用篩選</button>
+            <a href="bike-listing.php" class="btn btn-default btn-block">清除篩選</a>
+          </form>
         </div>
-      <?php }} ?>
-         </div>
+      </div>
+      <!-- /篩選側邊欄 -->
 
-      <!--Side-Bar-->
-      <aside class="col-md-3 col-md-pull-9">
-        <div class="sidebar_widget">
-          <div class="widget_heading">
-            <h5><i class="fa fa-filter" aria-hidden="true"></i> Find Your  Bike </h5>
-          </div>
-          <div class="sidebar_filter">
-            <form action="search-carresult.php" method="post">
-              <div class="form-group select">
-                <select class="form-control" name="brand">
-                  <option>Select Brand</option>
-
-                  <?php $sql = "SELECT * from  tblbrands ";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{       ?>
-<option value="<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?></option>
-<?php }} ?>
-
-                </select>
+      <!-- 電單車列表 -->
+      <div class="col-md-9 col-sm-8">
+        <div class="bike-grid-container">
+          <?php if ($query->rowCount() > 0) {
+              foreach ($vehicles as $vehicle) { ?>
+            <div class="bike-item-card">
+              <?php if (!empty($vehicle->Vimage1)) { ?>
+                <img src="admin/img/vehicleimages/<?php echo htmlentities($vehicle->Vimage1); ?>" alt="<?php echo htmlentities($vehicle->VehiclesTitle); ?>">
+              <?php } else { ?>
+                <img src="https://placehold.co/400x200/cccccc/333333?text=無圖片" alt="無圖片">
+              <?php } ?>
+              <div class="bike-item-content">
+                <h5><?php echo htmlentities($vehicle->VehiclesTitle); ?></h5>
+                <p>品牌: <?php echo htmlentities($vehicle->BrandName); ?></p>
+                <p>類型: <?php echo htmlentities($vehicle->BikeType ?: 'N/A'); ?></p> <!-- 顯示電單車類型 -->
+                <p>年份: <?php echo htmlentities($vehicle->ModelYear); ?></p>
+                <!-- 假設 TransactionCount 字段存在 -->
+                <?php if (isset($vehicle->TransactionCount)) { ?>
+                    <p>交易次數: <?php echo htmlentities($vehicle->TransactionCount); ?></p>
+                <?php } ?>
+                <div class="bike-item-price">HKD $<?php echo htmlentities($vehicle->PricePerDay); ?></div>
+                <a href="vehical-details.php?vhid=<?php echo htmlentities($vehicle->id); ?>" class="bike-item-link">查看詳情</a>
               </div>
-              <div class="form-group select">
-                <select class="form-control" name="fueltype">
-                  <option>Select Fuel Type</option>
-<option value="Petrol">Petrol</option>
-<option value="Diesel">Diesel</option>
-<option value="CNG">CNG</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <button type="submit" class="btn btn-block"><i class="fa fa-search" aria-hidden="true"></i> Search Bike</button>
-              </div>
-            </form>
-          </div>
+            </div>
+          <?php }} else { ?>
+            <div class="col-md-12">
+              <p class="text-center">沒有找到符合條件的電單車。</p>
+            </div>
+          <?php } ?>
         </div>
+      </div>
+      <!-- /電單車列表 -->
 
-        <div class="sidebar_widget">
-          <div class="widget_heading">
-            <h5><i class="fa fa-motorcycle" aria-hidden="true"></i> Recently Listed Bikes</h5>
-          </div>
-          <div class="recent_addedcars">
-            <ul>
-<?php $sql = "SELECT tblvehicles.*,tblbrands.BrandName,tblbrands.id as bid  from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand order by id desc limit 4";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{  ?>
-
-              <li class="gray-bg">
-                <div class="recent_post_img"> <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1);?>" alt="image"></a> </div>
-                <div class="recent_post_title"> <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a>
-                  <p class="widget_price">$<?php echo htmlentities($result->PricePerDay);?> Per Day</p>
-                </div>
-              </li>
-              <?php }} ?>
-
-            </ul>
-          </div>
-        </div>
-      </aside>
-      <!--/Side-Bar-->
     </div>
   </div>
 </section>
-<!-- /Listing-->
+<!-- /列表區塊 -->
 
-<!--Footer -->
+<!--頁腳 -->
 <?php include('includes/footer.php');?>
-<!-- /Footer-->
+<!-- /頁腳 -->
 
-<!--Back to top-->
+<!-- 回到頂部 -->
 <div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
-<!--/Back to top-->
+<!--/回到頂部 -->
 
-<!--Login-Form -->
+<!-- 登入表單 -->
 <?php include('includes/login.php');?>
-<!--/Login-Form -->
+<!--/登入表單 -->
 
-<!--Register-Form -->
+<!-- 註冊表單 -->
 <?php include('includes/registration.php');?>
 
-<!--/Register-Form -->
+<!--/註冊表單 -->
 
-<!--Forgot-password-Form -->
+<!-- 忘記密碼表單 -->
 <?php include('includes/forgotpassword.php');?>
+<!--/忘記密碼表單 -->
 
-<!-- Scripts -->
+<!-- 腳本 -->
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/interface.js"></script>
@@ -229,6 +464,5 @@ foreach($results as $result)
 <!--Slider-JS-->
 <script src="assets/js/slick.min.js"></script>
 <script src="assets/js/owl.carousel.min.js"></script>
-
 </body>
 </html>

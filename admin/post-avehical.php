@@ -150,170 +150,207 @@ $error="Something went wrong. Please try again";
 <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
 				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
 
-									<div class="panel-body">
-<form method="post" class="form-horizontal" enctype="multipart/form-data">
-<div class="form-group">
-<label class="col-sm-2 control-label">Vehicle Title<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<input type="text" name="vehicletitle" class="form-control" required>
-</div>
-<label class="col-sm-2 control-label">Select Brand<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<select class="selectpicker" name="brandname" required>
-<option value=""> Select </option>
-<?php $ret="select id,BrandName from tblbrands";
-$query= $dbh -> prepare($ret);
-//$query->bindParam(':id',$id, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
-if($query -> rowCount() > 0)
-{
-foreach($results as $result)
-{
-?>
-<option value="<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?></option>
-<?php }} ?>
+    <div class="panel-body">
+    <form method="post" class="form-horizontal" enctype="multipart/form-data">
+        <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
+        else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
 
-</select>
-</div>
+        <!-- 基本資訊 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Vehicle Title<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <input type="text" name="vehicletitle" class="form-control" required>
+            </div>
+            <label class="col-sm-2 control-label">Select Brand<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <select class="selectpicker" name="brandname" required>
+                    <option value=""> Select </option>
+                    <?php $ret="select id,BrandName from tblbrands";
+                    $query= $dbh -> prepare($ret);
+                    $query-> execute();
+                    $results = $query -> fetchAll(PDO::FETCH_OBJ);
+                    if($query -> rowCount() > 0)
+                    {
+                        foreach($results as $result)
+                        {
+                    ?>
+                    <option value="<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?></option>
+                    <?php }} ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="hr-dashed"></div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Vehicle Overview<span style="color:red">*</span></label>
+            <div class="col-sm-10">
+                <textarea class="form-control" name="vehicalorcview" rows="3" required></textarea>
+            </div>
+        </div>
+
+        <div class="hr-dashed"></div>
+
+        <!-- 價格, 電單車類型 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Price (HKD)<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <input type="number" name="priceperday" class="form-control" required>
+            </div>
+            <label class="col-sm-2 control-label">Select Motorcycle Type<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <select class="selectpicker" name="biketype" required>
+                    <option value=""> Select </option>
+                    <option value="Naked">Naked (街車)</option>
+                    <option value="Cruiser">Cruiser (巡航車)</option>
+                    <option value="Sports">Sports (跑車)</option>
+                    <option value="Touring">Touring (旅行車)</option>
+                    <option value="Off-road">Off-road (越野車)</option>
+                    <option value="Scooter">Scooter (綿羊仔)</option>
+                    <option value="Electric motorcycle">Electric motorcycle (電動車)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 燃油類型 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Select Fuel Type<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <select class="selectpicker" name="fueltype" required>
+                    <option value=""> Select </option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                </select>
+            </div>
+            <!-- 這是一個空佔位符，用於保持右側的對齊，如果未來有新的單一欄位可以放這裡 -->
+			 <label class="col-sm-2 control-label">Engine Displacement<span style="color:red">*</span></label>
+			 <div class="col-sm-4">
+			 <input type="number" name="enginedisplacement" class="form-control" required>
+            <div class="col-sm-6"></div> 
+        </div>
+
+        <div class="hr-dashed"></div>
+
+        <!-- 型號年份, 座位數 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Model Year<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <input type="number" name="modelyear" class="form-control" required>
+            </div>
+            <label class="col-sm-2 control-label">Seating Capacity<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <input type="number" name="seatingcapacity" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="hr-dashed"></div>
+
+        <!-- 交易次數 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Transaction Count</label>
+            <div class="col-sm-4">
+                <input type="number" name="transactioncount" class="form-control" value="0" min="0">
+            </div>
+            <div class="col-sm-6"></div> <!-- 空佔位符 -->
+        </div>
+
+        <div class="hr-dashed"></div>
+
+        <!-- 上傳圖片 -->
+        <div class="form-group">
+            <div class="col-sm-12">
+                <h4><b>Upload Images</b></h4>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-4">
+                Image 1 <span style="color:red">*</span><input type="file" name="img1" required>
+            </div>
+            <div class="col-sm-4">
+                Image 2<span style="color:red">*</span><input type="file" name="img2" required>
+            </div>
+            <div class="col-sm-4">
+                Image 3<span style="color:red">*</span><input type="file" name="img3" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-4">
+                Image 4<span style="color:red">*</span><input type="file" name="img4" required>
+            </div>
+            <div class="col-sm-4">
+                Image 5<input type="file" name="img5">
+            </div>
+            <div class="col-sm-4"></div> <!-- 空佔位符 -->
+        </div>
+        <div class="hr-dashed"></div>
+        
+        <!-- 配件 / 特色選項 (這裡的結構保持不變，因為它已經使用了 col-sm-3 進行網格佈局) -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Accessories / Features</div>
+                    <div class="panel-body">
+                        <!-- 現有的多選框組，如果它們是 col-sm-3，則不需要特別修改其父級結構 -->
+                        <div class="form-group"> <!-- 注意這裡額外加了一個 form-group 以更好地包裹 checkbox 行 -->
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="antilockbrakingsys" name="antilockbrakingsys" value="1">
+                                    <label for="antilockbrakingsys"> AntiLock Braking System </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="brakeassist" name="brakeassist" value="1">
+                                    <label for="brakeassist"> Brake Assist </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="powersteering" name="powersteering" value="1">
+                                    <label for="powersteering"> Power Steering </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="centrallocking" name="centrallocking" value="1">
+                                    <label for="centrallocking"> Central Locking </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="crashcensor" name="crashcensor" value="1">
+                                    <label for="crashcensor"> Crash Sensor </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="checkbox checkbox-inline">
+                                    <input type="checkbox" id="leatherseats" name="leatherseats" value="1">
+                                    <label for="leatherseats"> Leather Seats </label>
+                                </div>
+                            </div>
+                            <!-- 可以繼續添加其他特色選項，並用 col-sm-3 分割 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-8 col-sm-offset-2">
+                <button class="btn btn-default" type="reset">Cancel</button>
+                <button class="btn btn-primary" name="submit" type="submit">Save changes</button>
+            </div>
+        </div>
+
+    </form>
 </div>
 
-<div class="hr-dashed"></div>
-<div class="form-group">
-<label class="col-sm-2 control-label">Vehical Overview<span style="color:red">*</span></label>
-<div class="col-sm-10">
-<textarea class="form-control" name="vehicalorcview" rows="3" required></textarea>
-</div>
-</div>
-
-<div class="form-group">
-<label class="col-sm-2 control-label">Price Per Day(in USD)<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<input type="text" name="priceperday" class="form-control" required>
-</div>
-<label class="col-sm-2 control-label">Select Fuel Type<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<select class="selectpicker" name="fueltype" required>
-<option value=""> Select </option>
-
-<option value="Petrol">Petrol</option>
-<option value="Diesel">Diesel</option>
-<option value="CNG">CNG</option>
-</select>
-</div>
-</div>
-
-
-<div class="form-group">
-<label class="col-sm-2 control-label">Model Year<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<input type="text" name="modelyear" class="form-control" required>
-</div>
-<label class="col-sm-2 control-label">Seating Capacity<span style="color:red">*</span></label>
-<div class="col-sm-4">
-<input type="text" name="seatingcapacity" class="form-control" required>
-</div>
-</div>
-<div class="hr-dashed"></div>
-
-
-<div class="form-group">
-<div class="col-sm-12">
-<h4><b>Upload Images</b></h4>
-</div>
-</div>
-
-
-<div class="form-group">
-<div class="col-sm-4">
-Image 1 <span style="color:red">*</span><input type="file" name="img1" required>
-</div>
-<div class="col-sm-4">
-Image 2<span style="color:red">*</span><input type="file" name="img2" required>
-</div>
-<div class="col-sm-4">
-Image 3<span style="color:red">*</span><input type="file" name="img3" required>
-</div>
-</div>
-
-
-<div class="form-group">
-<div class="col-sm-4">
-Image 4<span style="color:red">*</span><input type="file" name="img4" required>
-</div>
-<div class="col-sm-4">
-Image 5<input type="file" name="img5">
-</div>
-
-</div>
-<div class="hr-dashed"></div>
-</div>
-</div>
-</div>
-</div>
-
-
-<div class="row">
-<div class="col-md-12">
-<div class="panel panel-default">
-<div class="panel-heading">Accessories</div>
-<div class="panel-body">
-
-
-
-<div class="col-sm-3">
-<div class="checkbox checkbox-inline">
-<input type="checkbox" id="antilockbrakingsys" name="antilockbrakingsys" value="1">
-<label for="antilockbrakingsys"> AntiLock Braking System </label>
-</div></div>
-<div class="checkbox checkbox-inline">
-<input type="checkbox" id="brakeassist" name="brakeassist" value="1">
-<label for="brakeassist"> Brake Assist </label>
-</div>
-</div>
-
-
-
-<div class="form-group">
-<div class="col-sm-3">
-<div class="checkbox checkbox-inline">
-<input type="checkbox" id="powersteering" name="powersteering" value="1">
-<input type="checkbox" id="powersteering" name="powersteering" value="1">
-<label for="inlineCheckbox5"> Smooth Handling </label>
-</div>
-</div>
-
-
-<div class="col-sm-3">
-<div class="checkbox h checkbox-inline">
-<input type="checkbox" id="centrallocking" name="centrallocking" value="1">
-<label for="centrallocking">Central Locking</label>
-</div></div>
-<div class="col-sm-3">
-<div class="checkbox checkbox-inline">
-<input type="checkbox" id="crashcensor" name="crashcensor" value="1">
-<label for="crashcensor"> Crash Sensor </label>
-</div></div>
-<div class="col-sm-3">
-<div class="checkbox checkbox-inline">
-<input type="checkbox" id="leatherseats" name="leatherseats" value="1">
-<label for="leatherseats"> Leather Seats </label>
-</div>
-</div>
-</div>
-
-
-
-
-											<div class="form-group">
-												<div class="col-sm-8 col-sm-offset-2">
-													<button class="btn btn-default" type="reset">Cancel</button>
-													<button class="btn btn-primary" name="submit" type="submit">Save changes</button>
-												</div>
-											</div>
-
-										</form>
-									</div>
 								</div>
 							</div>
 						</div>

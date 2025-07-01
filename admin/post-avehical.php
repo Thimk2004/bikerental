@@ -67,7 +67,33 @@ $query->bindParam(':centrallocking',$centrallocking,PDO::PARAM_STR);
 $query->bindParam(':crashcensor',$crashcensor,PDO::PARAM_STR);
 $query->bindParam(':leatherseats',$leatherseats,PDO::PARAM_STR);
 $query->execute();
+error_reporting(E_ALL); // 臨時打開所有錯誤報告
+ini_set('display_errors', 1); // 臨時顯示所有錯誤
+
+// ... (你的現有代碼) ...
+
+$query = $dbh->prepare($sql);
+foreach ($params as $key => $val) {
+    $query->bindParam($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+$query->execute();
+
+// 調試代碼開始
+echo "<h2>SQL Query:</h2><pre>" . $sql . "</pre>";
+echo "<h2>Parameters:</h2><pre>";
+print_r($params);
+echo "</pre>";
+echo "<h2>Query Results:</h2><pre>";
+print_r($vehicles);
+echo "</pre>";
+echo "<h2>Row Count:</h2><p>" . $query->rowCount() . "</p>";
+// 調試代碼結束
+
+$vehicles = $query->fetchAll(PDO::FETCH_OBJ);
+
 $lastInsertId = $dbh->lastInsertId();
+
+
 if($lastInsertId)
 {
 $msg="Vehicle posted successfully";
@@ -150,7 +176,7 @@ $error="Something went wrong. Please try again";
 <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
 				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
 
-    <div class="panel-body">
+<div class="panel-body">
     <form method="post" class="form-horizontal" enctype="multipart/form-data">
         <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
         else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
@@ -212,7 +238,7 @@ $error="Something went wrong. Please try again";
             </div>
         </div>
 
-        <!-- 燃油類型 -->
+        <!-- 燃油類型, 排氣量 -->
         <div class="form-group">
             <label class="col-sm-2 control-label">Select Fuel Type<span style="color:red">*</span></label>
             <div class="col-sm-4">
@@ -223,11 +249,10 @@ $error="Something went wrong. Please try again";
                     <option value="Electric">Electric</option>
                 </select>
             </div>
-            <!-- 這是一個空佔位符，用於保持右側的對齊，如果未來有新的單一欄位可以放這裡 -->
-			 <label class="col-sm-2 control-label">Engine Displacement<span style="color:red">*</span></label>
-			 <div class="col-sm-4">
-			 <input type="number" name="enginedisplacement" class="form-control" required>
-            <div class="col-sm-6"></div> 
+            <label class="col-sm-2 control-label">Engine Displacement (CC)<span style="color:red">*</span></label>
+            <div class="col-sm-4">
+                <input type="number" name="enginedisplacement" class="form-control" required>
+            </div>
         </div>
 
         <div class="hr-dashed"></div>
@@ -269,16 +294,16 @@ $error="Something went wrong. Please try again";
                 Image 1 <span style="color:red">*</span><input type="file" name="img1" required>
             </div>
             <div class="col-sm-4">
-                Image 2<span style="color:red">*</span><input type="file" name="img2" required>
+                Image 2<input type="file" name="img2">
             </div>
             <div class="col-sm-4">
-                Image 3<span style="color:red">*</span><input type="file" name="img3" required>
+                Image 3<input type="file" name="img3">
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-sm-4">
-                Image 4<span style="color:red">*</span><input type="file" name="img4" required>
+                Image <input type="file" name="img4">
             </div>
             <div class="col-sm-4">
                 Image 5<input type="file" name="img5">
@@ -347,6 +372,10 @@ $error="Something went wrong. Please try again";
                 <button class="btn btn-primary" name="submit" type="submit">Save changes</button>
             </div>
         </div>
+
+    </form>
+</div>
+
 
     </form>
 </div>

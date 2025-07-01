@@ -16,6 +16,19 @@ $sort_options = [
 // 定義電單車類型
 $bike_types = ['Naked', 'Cruiser', 'Sports', 'Touring', 'Off-road', 'Scooter', 'Electric motorcycle'];
 
+// 定義可篩選的排氣量範圍
+$engine_displacement_ranges = [
+    '0-150' => '0 - 150 CC',
+    '151-250' => '151 - 250 CC',
+    '251-400' => '251 - 400 CC',
+    '401-600' => '401 - 600 CC',
+    '601-800' => '601 - 800 CC',
+    '801-1000' => '801 - 1000 CC',
+    '1001-over' => '1001+ CC'
+];
+// 初始化排氣量篩選變量
+$selected_engine_displacement = isset($_GET['enginedisplacement']) ? $_GET['enginedisplacement'] : '';
+
 // 從數據庫獲取品牌列表
 $brands_from_db = [];
 $ret_brands = "SELECT id, BrandName FROM tblbrands ORDER BY BrandName ASC";
@@ -62,6 +75,18 @@ if ($min_price !== '') { // 允許 0 作為有效最低價格
 if ($max_price !== '') { // 允許 0 作為有效最高價格
     $sql .= " AND tv.PricePerDay <= :maxprice";
     $params[':maxprice'] = $max_price;
+}
+
+// 排氣量篩選
+if (!empty($selected_engine_displacement)) {
+    if ($selected_engine_displacement === '1001-over') {
+        $sql .= " AND tv.EngineDisplacement >= 1001";
+    } else {
+        list($min_cc, $max_cc) = explode('-', $selected_engine_displacement);
+        $sql .= " AND tv.EngineDisplacement BETWEEN :mincc AND :maxcc";
+        $params[':mincc'] = intval($min_cc);
+        $params[':maxcc'] = intval($max_cc);
+    }
 }
 // 交易次數篩選 (根據 TransactionCount 字段)
 if (!empty($transaction_count_range)) {
@@ -368,6 +393,18 @@ foreach ($result_years as $year) {
             </div>
 
             <div class="form-group">
+              <label for="engine_displacement">Engine Displacement (CC):</label>
+              <select class="form-control" id="engine_displacement" name="enginedisplacement" onchange="this.form.submit()">
+                <option value="">Select CC Range</option>
+                <?php foreach ($engine_displacement_ranges as $key => $value) { ?>
+                  <option value="<?php echo htmlentities($key); ?>" <?php if ($selected_engine_displacement == $key) echo 'selected'; ?>>
+                    <?php echo htmlentities($value); ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label for="transaction_count_range">交易次數:</label>
               <select class="form-control" id="transaction_count_range" name="transaction_count_range" onchange="this.form.submit()">
                 <option value="">選擇範圍</option>
@@ -409,6 +446,7 @@ foreach ($result_years as $year) {
                 <h5><?php echo htmlentities($vehicle->VehiclesTitle); ?></h5>
                 <p>品牌: <?php echo htmlentities($vehicle->BrandName); ?></p>
                 <p>類型: <?php echo htmlentities($vehicle->BikeType ?: 'N/A'); ?></p> <!-- 顯示電單車類型 -->
+                <p>Engine: <?php echo htmlentities($vehicle->EngineDisplacement); ?> CC</p>
                 <p>年份: <?php echo htmlentities($vehicle->ModelYear); ?></p>
                 <!-- 假設 TransactionCount 字段存在 -->
                 <?php if (isset($vehicle->TransactionCount)) { ?>

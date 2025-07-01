@@ -1,4 +1,10 @@
-
+<?php // 確保這裡有 <?php 開頭，以便 session_start() 能正常運行
+// 雖然在 bike-listing.php 中已經有 session_start()，但在 header.php 中重複加上是常見且安全的做法，
+// 以防 header.php 被其他沒有 session_start() 的頁面單獨包含。
+// 但由於您已經在 bike-listing.php 開頭添加了，這裡可以選擇不重複添加。
+// 如果您遇到 session 相關問題，可以考慮在此處也加上 session_start();
+// session_start(); // 如果需要，可以取消註解此行
+?>
 <header>
   <div class="default-header">
     <div class="container">
@@ -25,14 +31,17 @@
                 <li><a href="https://code-projects.org/"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
               </ul>
             </div>
-   <?php   if(strlen($_SESSION['login'])==0)
+   <?php
+   // 修正點 1: 檢查 $_SESSION['login'] 是否存在且其長度為 0
+   // 如果不存在，則視為未登入狀態
+   if(!isset($_SESSION['login']) || strlen($_SESSION['login']) == 0)
 	{
 ?>
  <div class="login_btn"> <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal" data-dismiss="modal">Login / Register</a> </div>
 <?php }
 else{
-
-echo "Welcome To Bike rental portal";
+    // 如果 $_SESSION['login'] 存在且不為空，表示已登入
+    echo "Welcome To Bike rental portal";
  } ?>
           </div>
         </div>
@@ -40,7 +49,6 @@ echo "Welcome To Bike rental portal";
     </div>
   </div>
 
-  <!-- Navigation -->
   <nav id="navigation_bar" class="navbar navbar-default">
     <div class="container">
       <div class="navbar-header">
@@ -51,20 +59,31 @@ echo "Welcome To Bike rental portal";
           <ul>
             <li class="dropdown"> <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle" aria-hidden="true"></i>
 <?php
-$email=$_SESSION['login'];
-$sql ="SELECT FullName FROM tblusers WHERE EmailId=:email ";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-	{
-
-	 echo htmlentities($result->FullName); }}?><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+// 修正點 2: 檢查 $_SESSION['login'] 是否存在且不為空
+if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
+    $email = $_SESSION['login'];
+    $sql ="SELECT FullName FROM tblusers WHERE EmailId=:email ";
+    $query= $dbh -> prepare($sql);
+    $query-> bindParam(':email', $email, PDO::PARAM_STR);
+    $query-> execute();
+    $results=$query->fetchAll(PDO::FETCH_OBJ);
+    if($query->rowCount() > 0)
+    {
+        foreach($results as $result)
+        {
+            echo htmlentities($result->FullName);
+        }
+    } else {
+        echo "Guest"; // 如果找不到使用者名稱，顯示 "Guest"
+    }
+} else {
+    echo "Guest"; // 如果未登入，顯示 "Guest"
+}
+?><i class="fa fa-angle-down" aria-hidden="true"></i></a>
               <ul class="dropdown-menu">
-           <?php if($_SESSION['login']){?>
+           <?php
+           // 修正點 3: 檢查 $_SESSION['login'] 是否存在且為真 (已登入)
+           if(isset($_SESSION['login']) && $_SESSION['login']){?>
             <li><a href="profile.php">Profile Settings</a></li>
               <li><a href="update-password.php">Update Password</a></li>
             <li><a href="my-booking.php">My Booking</a></li>
@@ -108,6 +127,4 @@ foreach($results as $result)
       </div>
     </div>
   </nav>
-  <!-- Navigation end -->
-
-</header>
+  </header>

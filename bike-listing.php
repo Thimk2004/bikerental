@@ -1,6 +1,8 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1); 
+//error_reporting(0); // 關閉所有錯誤報告，正式環境建議開啟或設定為 E_ALL & ~E_NOTICE
 include('includes/config.php');
 
 // 定義可用的排序選項
@@ -46,8 +48,11 @@ $selected_sort = isset($_GET['sort']) && array_key_exists($_GET['sort'], $sort_o
 $selected_type = isset($_GET['type']) && in_array($_GET['type'], $bike_types) ? $_GET['type'] : '';
 $selected_brand_id = isset($_GET['brand']) ? intval($_GET['brand']) : ''; // 使用品牌 ID 進行篩選
 $selected_model_year = isset($_GET['modelyear']) ? intval($_GET['modelyear']) : '';
-$min_price = isset($_GET['min_price']) ? intval($_GET['min_price']) : '';
-$max_price = isset($_GET['max_price']) ? intval($_GET['max_price']) : '';
+
+// 價格篩選：如果輸入框為空，則設為 null，這樣就不會參與 SQL 篩選
+$min_price = isset($_GET['min_price']) && $_GET['min_price'] !== '' ? intval($_GET['min_price']) : null;
+$max_price = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? intval($_GET['max_price']) : null;
+
 $transaction_count_range = isset($_GET['transaction_count_range']) ? $_GET['transaction_count_range'] : '';
 
 
@@ -68,11 +73,11 @@ if (!empty($selected_model_year)) {
     $sql .= " AND tv.ModelYear = :modelyear";
     $params[':modelyear'] = $selected_model_year;
 }
-if ($min_price !== '') { // 允許 0 作為有效最低價格
+if ($min_price !== null) { // 只有當 min_price 不為 null 時才應用篩選
     $sql .= " AND tv.PricePerDay >= :minprice";
     $params[':minprice'] = $min_price;
 }
-if ($max_price !== '') { // 允許 0 作為有效最高價格
+if ($max_price !== null) { // 只有當 max_price 不為 null 時才應用篩選
     $sql .= " AND tv.PricePerDay <= :maxprice";
     $params[':maxprice'] = $max_price;
 }
@@ -121,7 +126,7 @@ switch ($selected_sort) {
         break;
     case 'default':
     default:
-        $sql .= " ORDER BY tv.id DESC"; // 預設按 ID 降序 (最新)
+        $sql .= " ORDER BY tv.RegDate DESC"; // 預設按 RegDate 降序 (最新)
         break;
 }
 
@@ -131,7 +136,7 @@ foreach ($params as $key => $val) {
     $query->bindParam($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
 }
 $query->execute();
-$vehicles = $query->fetchAll(PDO::FETCH_OBJ);
+$vehicles = $query->fetchAll(PDO::FETCH_OBJ); // 這裡只調用一次 fetchAll()
 
 // 從數據庫獲取所有獨特的型號年份，用於篩選下拉菜單
 $model_years = [];
@@ -499,7 +504,6 @@ foreach ($result_years as $year) {
 <script src="assets/switcher/js/switcher.js"></script>
 <!--bootstrap-slider-JS-->
 <script src="assets/js/bootstrap-slider.min.js"></script>
-<!--Slider-JS-->
 <script src="assets/js/slick.min.js"></script>
 <script src="assets/js/owl.carousel.min.js"></script>
 </body>

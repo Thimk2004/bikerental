@@ -1,25 +1,62 @@
 <?php
 session_start();
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{
-header('location:index.php');
-}
-else{
+error_reporting(0); // 關閉所有錯誤報告，正式環境建議開啟或設定為 E_ALL & ~E_NOTICE
+include('includes/config.php'); // 包含數據庫配置
 
-if(isset($_REQUEST['del']))
-	{
-$delid=intval($_GET['del']);
-$sql = "delete from tblvehicles SET id=:status WHERE  id=:delid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':delid',$delid, PDO::PARAM_STR);
-$query -> execute();
-$msg="Vehicle  record deleted successfully";
-}
+// 檢查管理員是否已登入
+if(strlen($_SESSION['alogin'])==0) {
+    header('location:index.php'); // 未登入則重定向到登入頁面
+    exit(); // 終止腳本執行
+} else { // 管理員已登入
+
+    $error = ''; // 初始化錯誤訊息變量
+    $msg = '';   // 初始化成功訊息變量
+
+    // 處理刪除請求
+    if(isset($_GET['del'])) { // 確保只處理 GET 請求中的 'del' 參數
+        $delid=intval($_GET['del']); // 確保 ID 是整數，防止 SQL 注入
+
+        // 可選：在刪除數據庫記錄之前，先刪除相關的圖片文件
+        // 獲取圖片文件名
+        $sql_select_imgs = "SELECT Vimage1, Vimage2, Vimage3, Vimage4, Vimage5 FROM tblvehicles WHERE id=:id";
+        $query_select_imgs = $dbh->prepare($sql_select_imgs);
+        $query_select_imgs->bindParam(':id', $delid, PDO::PARAM_INT); // 綁定 ID 為 INT 類型
+        $query_select_imgs->execute();
+        $result_imgs = $query_select_imgs->fetch(PDO::FETCH_OBJ);
+
+        $target_dir = "img/vehicleimages/"; // 圖片存放路徑 (相對於 admin/ 目錄)
+
+        if($result_imgs) {
+            // 刪除所有相關圖片文件 (如果存在)
+            if(!empty($result_imgs->Vimage1) && file_exists($target_dir . $result_imgs->Vimage1)) {
+                unlink($target_dir . $result_imgs->Vimage1);
+            }
+            if(!empty($result_imgs->Vimage2) && file_exists($target_dir . $result_imgs->Vimage2)) {
+                unlink($target_dir . $result_imgs->Vimage2);
+            }
+            if(!empty($result_imgs->Vimage3) && file_exists($target_dir . $result_imgs->Vimage3)) {
+                unlink($target_dir . $result_imgs->Vimage3);
+            }
+            if(!empty($result_imgs->Vimage4) && file_exists($target_dir . $result_imgs->Vimage4)) {
+                unlink($target_dir . $result_imgs->Vimage4);
+            }
+            if(!empty($result_imgs->Vimage5) && file_exists($target_dir . $result_imgs->Vimage5)) {
+                unlink($target_dir . $result_imgs->Vimage5);
+            }
+        }
 
 
- ?>
+        // 正確的 DELETE SQL 語句：只刪除，不設置其他字段
+        $sql = "DELETE FROM tblvehicles WHERE id=:id";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':id',$delid, PDO::PARAM_INT); // ID 是整數，使用 PDO::PARAM_INT
+        $query->execute();
+
+        $msg="Vehicle record deleted successfully"; // 成功訊息
+    }
+
+// ... HTML 和其他 PHP 程式碼保持不變 ...
+?>
 
 <!doctype html>
 <html lang="en" class="no-js">

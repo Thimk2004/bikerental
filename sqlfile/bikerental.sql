@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 01, 2025 at 08:29 AM
+-- Generation Time: Jul 01, 2025 at 09:44 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -297,14 +297,8 @@ CREATE TABLE `tblvehicles` (
 --
 
 INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `BikeType`, `VehiclesOverview`, `PricePerDay`, `FuelType`, `EngineDisplacement`, `ModelYear`, `SeatingCapacity`, `TransactionCount`, `Vimage1`, `Vimage2`, `Vimage3`, `Vimage4`, `Vimage5`, `AirConditioner`, `PowerDoorLocks`, `AntiLockBrakingSystem`, `BrakeAssist`, `PowerSteering`, `DriverAirbag`, `PassengerAirbag`, `PowerWindows`, `CDPlayer`, `CentralLocking`, `CrashSensor`, `LeatherSeats`, `RegDate`, `UpdationDate`) VALUES
-(1, 'SS400', 2, NULL, 'Slowly spreading its cards this year, the Ace of Bajaj Autos is still not on the table. With the expectations like Pulsar 400SS or Pulsar SS400, the Ace (400SS) would be the commander of the Pulsar series. It would be a benchmark for the other motorcycle manufacturers as the competition for more performance oriented bikes will definitely rise this year.', 345345, 'Petrol', NULL, 3453, 2, 0, 'knowledges_base_bg.jpg', '20170523_145633.jpg', 'codepro.png', 'social-icons.png', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '2017-06-19 11:46:23', '2017-06-20 18:38:13'),
-(2, 'RS200', 2, NULL, 'The Pulsar is by far the most successful brand Bajaj has managed to create in the recent past.It is also fast, no doubt. But, its true highlight is its easy to ride nature. ', 859, 'Petrol', NULL, 2015, 2, 0, 'bike_755x430.png', 'looking-used-bike.png', 'front-image.jpg', 'about_services_faq_bg.jpg', '', 1, 1, 1, 1, 1, 1, 1, NULL, 1, 1, NULL, NULL, '2017-06-19 16:16:17', '2017-06-21 16:57:11'),
-(3, 'R1', 4, NULL, ' The Suzuki GSX-R1000 is a sport bike from Suzuki GSX-R series of motorcycles.It was introduced in 2001 to replace the GSX-R1100 and is powered by a liquid-cooled 999 cc (61.0 cu in) inline four-cylinder, four-stroke engine.', 563, 'Petrol', NULL, 2012, 2, 0, 'featured-img-300.jpg', 'dealer-logos.jpg', 'img_390x3900.jpg', 'listing_img303.jpg', '', 1, 1, 1, 1, 1, 1, NULL, 1, 1, NULL, NULL, NULL, '2017-06-19 16:18:20', '2017-06-20 18:40:11'),
-(4, 'Duke390', 1, NULL, ' The KTM 390 DUKE breathes life into values that have made motorcycling so amazing for decades. It combines maximum riding pleasure with optimum user value and comes out on top wherever nimble handling counts. Light as a feather, powerful and packed with state-of-the-art technology, it guarantees a thrilling ride, whether youre in the urban jungle or a forest of bends. 390 DUKE – nowhere you will find more motorcycle per euro.', 5636, 'Petrol', NULL, 2012, 2, 0, 'featured-img-3000.jpg', 'featured-img-1000.png', 'featured-img-1000.png', 'featured-img-1000.png', '', 1, 1, 1, 1, 1, 1, 1, 1, 1, NULL, NULL, NULL, '2017-06-19 16:18:43', '2017-06-20 18:44:12'),
-(5, 'R1', 5, NULL, 'The YZF-R1® features a lightweight and compact crossplane crankshaft, inline-four-cylinder, 998cc high output engine. Featuring titanium fracture-split connecting rods, an offset cylinder block and magnesium covers, the motor delivers extremely high horsepower and a strong pulse of linear torque for outstanding performance, all wrapped in aerodynamic MotoGP®-style bodywork.', 345345, 'Petrol', NULL, 3453, 2, 0, 'bikes_755x430.png', NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '2017-06-20 17:57:09', '2017-06-21 16:56:43'),
-(6, '1123', 3, NULL, 'honda PCX160', 100, 'Petrol', NULL, 2025, 2, 0, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-24 12:23:23', NULL),
-(7, 'CB400 3', 3, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-06-26 18:28:40'),
-(8, 'CB400 3', 3, NULL, '123', 27000, 'Petrol', NULL, 2007, 2, 0, 'cb400-3-2.jpg', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-26 18:33:30', NULL);
+(6, '1123', 3, 'Naked', 'honda PCX160', 100, 'Petrol', 160, 2025, 2, 2, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-24 12:23:23', '2025-07-01 06:40:31'),
+(7, 'CB400 3', 3, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-06-26 18:28:40');
 
 --
 -- Indexes for dumped tables

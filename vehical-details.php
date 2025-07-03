@@ -62,7 +62,7 @@ $vhid = intval($_GET['vhid']);
 
 // Fetch vehicle details from database
 // Ensure all necessary columns like BikeType, EngineDisplacement, TransactionCount are selected
-$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE tv.id=:vhid";
+$sql = "SELECT tv.*, tb.BrandName, tu.FullName, tu.EmailId as SellerEmail, tu.ContactNo as SellerPhone FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id LEFT JOIN tblusers tu ON tv.UserId = tu.id WHERE tv.id=:vhid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':vhid', $vhid, PDO::PARAM_INT);
 $query->execute();
@@ -80,22 +80,13 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
   <meta name="keywords" content="">
   <meta name="description" content="">
   <title>Bike Rental Portal | Vehicle Details</title>
-  <!--Bootstrap -->
   <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
-  <!--Custom Style -->
   <link rel="stylesheet" href="assets/css/styles.css" type="text/css">
-  <!--OWL Carousel slider-->
   <link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
   <link rel="stylesheet" href="assets/css/owl.transitions.css" type="text/css">
-  <!--slick-slider -->
   <link href="assets/css/slick.css" rel="stylesheet">
-  <!--bootstrap-slider -->
   <link href="assets/css/bootstrap-slider.min.css" rel="stylesheet">
-  <!--FontAwesome Font Style -->
-  <link href="assets/css/font-awesome.min.css" rel="stylesheet"> <!-- 確保 Font Awesome CSS 引用已啟用 -->
-
-  <!-- SWITCHER -->
-  <link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet"> <link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
   <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all" data-default-color="true" />
   <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
   <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
@@ -266,19 +257,13 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
 
 <body>
 
-  <!-- Start Switcher -->
   <?php include('includes/colorswitcher.php'); ?>
-  <!-- /Switcher -->
-
-  <!--Header-->
   <?php include('includes/header.php'); ?>
-  <!-- /Header -->
-
   <?php
   // Fetch vehicle details from database
   $vhid = intval($_GET['vhid']);
   // Ensure all necessary columns like BikeType, EngineDisplacement, TransactionCount are selected
-  $sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE tv.id=:vhid";
+  $sql = "SELECT tv.*, tb.BrandName, tu.FullName, tu.EmailId as SellerEmail, tu.ContactNo as SellerPhone FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id LEFT JOIN tblusers tu ON tv.UserId = tu.id WHERE tv.id=:vhid";
   $query = $dbh->prepare($sql);
   $query->bindParam(':vhid', $vhid, PDO::PARAM_INT); // Changed to PARAM_INT as vhid is int
   $query->execute();
@@ -300,16 +285,13 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
           </ul>
         </div>
       </div>
-      <!-- Dark Overlay-->
       <div class="dark-overlay"></div>
     </section>
 
-    <!-- Listing Detail Section -->
     <section class="listing-detail">
       <div class="container">
         <div class="row">
           <div class="col-md-9">
-            <!-- Main Image and Thumbnails -->
             <div class="listing_images">
               <?php if (!empty($result->Vimage1)) { ?>
                 <img id="mainImage" src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" alt="<?php echo htmlentities($result->VehiclesTitle); ?>">
@@ -317,7 +299,6 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                 <img id="mainImage" src="https://placehold.co/800x450/cccccc/333333?text=No+Image" alt="No Image">
               <?php } ?>
 
-              <!-- Thumbnail Images (All 5 images shown as clickable thumbnails) -->
               <div class="row small-images">
                 <?php if (!empty($result->Vimage1)) { ?>
                   <div class="col-sm-2 col-xs-4"><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" onclick="changeMainImage(this)" alt="Thumbnail 1"></div>
@@ -337,28 +318,16 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
               </div>
             </div>
 
-            <!-- Main Features / Price / Basic Info -->
             <div class="main_features">
               <div class="row">
                 <div class="col-md-8">
                   <h2><?php echo htmlentities($result->BrandName); ?>, <?php echo htmlentities($result->VehiclesTitle); ?></h2>
                   <p class="list-price">HKD $<?php echo htmlentities($result->PricePerDay); ?> <span style="font-size:0.7em; color:#666;">Price</span></p>
                 </div>
-                <div class="col-md-4 text-right">
-                  <div class="share-buttons">
-                    <!-- Social Share Buttons -->
-                    <p>Share:
-                      <a href="#"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
-                      <a href="#"><i class="fa fa-twitter-square" aria-hidden="true"></i></a>
-                      <a href="#"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
-                      <a href="#"><i class="fa fa-google-plus-square" aria-hidden="true"></i></a>
-                    </p>
-                  </div>
-                </div>
+
               </div>
 
               <div class="listing_other_info row">
-                <!-- Reg. Year -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#4932b8">
 
@@ -368,14 +337,13 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
 
                     <g id="SVGRepo_iconCarrier">
-                      <path d="m169.09 316.03v-41.984c0.019531-16.699 6.6602-32.707 18.465-44.512 11.809-11.805 27.816-18.445 44.512-18.465h62.977v62.977c0 7.5 4 14.43 10.496 18.18 6.4922 3.75 14.496 3.75 20.992 0 6.4922-3.75 10.496-10.68 10.496-18.18v-62.977h125.95v62.977c0 7.5 4 14.43 10.496 18.18 6.4922 3.75 14.496 3.75 20.988 0 6.4961-3.75 10.496-10.68 10.496-18.18v-62.977h62.977c16.699 0.019532 32.707 6.6602 44.512 18.465 11.809 11.805 18.449 27.812 18.465 44.512v41.984zm461.82 41.984v209.92c-0.015625 16.699-6.6562 32.707-18.465 44.512-11.805 11.809-27.812 18.449-44.512 18.465h-335.87c-16.695-0.015625-32.703-6.6562-44.512-18.465-11.805-11.805-18.445-27.812-18.465-44.512v-209.92zm-251.9 146.94c0-5.5664-2.2109-10.906-6.1484-14.844s-9.2773-6.1484-14.844-6.1484h-83.969c-7.5 0-14.43 4.0039-18.18 10.496-3.75 6.4961-3.75 14.5 0 20.992 3.75 6.4961 10.68 10.496 18.18 10.496h83.969c5.5664 0.003906 10.906-2.207 14.844-6.1445s6.1484-9.2773 6.1484-14.848zm0-83.969v0.003907c0-5.5703-2.2109-10.91-6.1484-14.848s-9.2773-6.1484-14.844-6.1445h-83.969c-7.5 0-14.43 4-18.18 10.496-3.75 6.4922-3.75 14.496 0 20.992 3.75 6.4922 10.68 10.496 18.18 10.496h83.969c5.5664 0 10.906-2.2109 14.844-6.1484s6.1484-9.2773 6.1484-14.844zm167.94 83.969h-0.003906c0.003906-5.5664-2.207-10.906-6.1445-14.844s-9.2773-6.1484-14.848-6.1484h-83.965c-7.5 0-14.43 4.0039-18.18 10.496-3.75 6.4961-3.75 14.5 0 20.992 3.75 6.4961 10.68 10.496 18.18 10.496h83.969-0.003906c5.5703 0.003906 10.91-2.207 14.848-6.1445s6.1484-9.2773 6.1445-14.848zm0-83.969-0.003906 0.003907c0.003906-5.5703-2.207-10.91-6.1445-14.848s-9.2773-6.1484-14.848-6.1445h-83.965c-7.5 0-14.43 4-18.18 10.496-3.75 6.4922-3.75 14.496 0 20.992 3.75 6.4922 10.68 10.496 18.18 10.496h83.969-0.003906c5.5703 0 10.91-2.2109 14.848-6.1484s6.1484-9.2773 6.1445-14.844z" />
+                      <path d="m169.09 316.03v-41.984c0.019531-16.699 6.6602-32.707 18.465-44.512 11.809-11.805 27.816-18.445 44.512-18.465h62.977v62.977c0 7.5 4 14.43 10.496 18.18 6.4922 3.75 14.496 3.75 20.992 0 6.4922-3.75 10.496-10.68 10.496-18.18v-62.977h125.95v62.977c0 7.5 4 14.43 10.496 18.18 6.4922 3.75 14.496 3.75 20.988 0 6.4961-3.75 10.496-10.68 10.496-18.18v-62.977h62.977c16.699 0.019532 32.707 6.6602 44.512 18.465 11.809 11.805 18.449 27.812 18.465 44.512v41.984zm461.82 41.984v209.92c-0.015625 16.699-6.6562 32.707-18.465 44.512-11.805 11.809-27.812 18.449-18.465 44.512h-335.87c-16.695-0.015625-32.703-6.6562-44.512-18.465-11.805-11.805-18.445-27.812-18.465-44.512v-209.92zm-251.9 146.94c0-5.5664-2.2109-10.906-6.1484-14.844s-9.2773-6.1484-14.844-6.1484h-83.969c-7.5 0-14.43 4.0039-18.18 10.496-3.75 6.4961-3.75 14.5 0 20.992 3.75 6.4961 10.68 10.496 18.18 10.496h83.969c5.5664 0.003906 10.906-2.207 14.844-6.1445s6.1484-9.2773 6.1484-14.848zm0-83.969v0.003907c0-5.5703-2.2109-10.91-6.1484-14.848s-9.2773-6.1484-14.844-6.1445h-83.969c-7.5 0-14.43 4-18.18 10.496-3.75 6.4922-3.75 14.496 0 20.992 3.75 6.4922 10.68 10.496 18.18 10.496h83.969c5.5664 0 10.906-2.2109 14.844-6.1484s6.1484-9.2773 6.1484-14.844zm167.94 83.969h-0.003906c0.003906-5.5664-2.207-10.906-6.1445-14.844s-9.2773-6.1484-14.848-6.1484h-83.965c-7.5 0-14.43 4.0039-18.18 10.496-3.75 6.4961-3.75 14.5 0 20.992 3.75 6.4961 10.68 10.496 18.18 10.496h83.969-0.003906c5.5703 0.003906 10.91-2.207 14.848-6.1445s6.1484-9.2773 6.1445-14.848zm0-83.969-0.003906 0.003907c0.003906-5.5703-2.207-10.91-6.1445-14.848s-9.2773-6.1484-14.848-6.1445h-83.965c-7.5 0-14.43 4-18.18 10.496-3.75 6.4922-3.75 14.496 0 20.992 3.75 6.4922 10.68 10.496 18.18 10.496h83.969-0.003906c5.5703 0 10.91-2.2109 14.848-6.1484s6.1484-9.2773 6.1445-14.844z" />
                     </g>
 
                   </svg>
                   <p><?php echo htmlentities($result->ModelYear); ?></p>
                   <span>Reg. Year</span>
                 </div>
-                <!-- Engine Displacement -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#5990d9">
 
@@ -396,7 +364,6 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                   <p><?php echo htmlentities($result->EngineDisplacement); ?> CC</p>
                   <span>Engine</span>
                 </div>
-                <!-- Bike Type -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#616ae5">
 
@@ -412,7 +379,6 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                   <p><?php echo htmlentities($result->BikeType ?: 'N/A'); ?></p>
                   <span>Bike Type</span>
                 </div>
-                <!-- Transaction Count -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg" fill="#616ae5">
 
@@ -435,7 +401,6 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                   <p><?php echo htmlentities($result->TransactionCount); ?></p>
                   <span>Transactions</span>
                 </div>
-                <!-- Fuel Type -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg">
 
@@ -455,7 +420,6 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                   <p><?php echo htmlentities($result->FuelType); ?></p>
                   <span>Fuel Type</span>
                 </div>
-                <!-- Seats -->
                 <div class="col-md-2 col-sm-4 col-xs-6 feature-box">
                   <svg fill="#616ae5" width="50px" height="50px" version="1.1" viewBox="144 144 512 512" xmlns="http://www.w3.org/2000/svg">
 
@@ -479,21 +443,19 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
               </div>
             </div>
 
-            <!-- Vehicle Overview & Accessories Tabs -->
             <div class="listing_detail_wrap">
               <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#vehicle-overview" aria-controls="vehicle-overview" role="tab" data-toggle="tab">Vehicle Overview</a></li>
                 <li role="presentation"><a href="#accessories" aria-controls="accessories" role="tab" data-toggle="tab">Accessories</a></li>
+                <li role="presentation"><a href="#contacts-info" aria-controls="contacts-info" role="tab" data-toggle="tab">Contacts Info</a></li>
               </ul>
 
               <div class="tab-content">
-                <!-- Vehicle Overview Tab -->
                 <div role="tabpanel" class="tab-pane active" id="vehicle-overview">
                   <h3>Vehicle Overview</h3>
                   <p><?php echo nl2br(htmlentities($result->VehiclesOverview)); ?></p>
                 </div>
 
-                <!-- Accessories Tab -->
                 <div role="tabpanel" class="tab-pane" id="accessories">
                   <h3>Accessories</h3>
                   <div class="row">
@@ -517,20 +479,48 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
                     </div>
                   </div>
                 </div>
-              </div>
+
+                <div role="tabpanel" class="tab-pane" id="contacts-info">
+                  <h3>Contacts Info</h3>
+                  <?php
+                  $sellerUserId = $result->UserId; // 從 tblvehicles 獲取發布者的 UserId
+
+                  if ($sellerUserId) {
+                    $sql_contacts = "SELECT ContactType, ContactValue, Description FROM tbluser_contacts WHERE UserId = :userid";
+                    $query_contacts = $dbh->prepare($sql_contacts);
+                    $query_contacts->bindParam(':userid', $sellerUserId, PDO::PARAM_INT);
+                    $query_contacts->execute();
+                    $contacts = $query_contacts->fetchAll(PDO::FETCH_OBJ);
+
+                    if ($contacts) {
+                      echo "<p><strong>Seller Name:</strong> " . htmlentities($result->FullName) . "</p>";
+                      echo "<p><strong>Seller Email:</strong> " . htmlentities($result->SellerEmail) . "</p>";
+                      echo "<p><strong>Seller Phone:</strong> " . htmlentities($result->SellerPhone) . "</p>";
+
+                      echo "<h4>Additional Contact Methods:</h4>";
+                      echo "<ul>";
+                      foreach ($contacts as $contact) {
+                        echo "<li><strong>" . htmlentities($contact->ContactType) . ":</strong> " . htmlentities($contact->ContactValue);
+                        if (!empty($contact->Description)) {
+                          echo " (" . htmlentities($contact->Description) . ")";
+                        }
+                        echo "</li>";
+                      }
+                      echo "</ul>";
+                    } else {
+                      echo "<p>No additional contact information available for this seller.</p>";
+                      echo "<p><strong>Seller Name:</strong> " . htmlentities($result->FullName) . "</p>";
+                      echo "<p><strong>Seller Email:</strong> " . htmlentities($result->SellerEmail) . "</p>";
+                      echo "<p><strong>Seller Phone:</strong> " . htmlentities($result->SellerPhone) . "</p>";
+                    }
+                  } else {
+                    echo "<p>Seller information is not available.</p>";
+                  }
+                  ?>
+                </div>
+                </div>
             </div>
 
-            <!-- Sidebar (Removed Booking Form) -->
-            <div class="col-md-3">
-              <!-- Removed the entire "Book Now" section as requested -->
-              <div class="sidebar">
-                <h5>Contact Seller</h5>
-                <p>For inquiries about this bike, please contact the seller directly.</p>
-                <p>Email: <a href="mailto:seller@example.com">seller@example.com</a></p>
-                <p>Phone: +123-456-7890</p>
-                <!-- You might want to implement a contact form here later -->
-              </div>
-            </div>
           </div>
         </div>
     </section>
@@ -564,35 +554,16 @@ $result = $query->fetch(PDO::FETCH_OBJ); // Use fetch() as we expect only one re
     </section>
   <?php } ?>
 
-  <!--Footer -->
   <?php include('includes/footer.php'); ?>
-  <!-- /Footer-->
-
-  <!--Back to top-->
   <div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
-  <!--/Back to top-->
-
-  <!--Login-Form -->
   <?php include('includes/login.php'); ?>
-  <!--/Login-Form -->
-
-  <!--Register-Form -->
   <?php include('includes/registration.php'); ?>
-  <!--/Register-Form -->
-
-  <!--Forgot-password-Form -->
   <?php include('includes/forgotpassword.php'); ?>
-  <!--/Forgot-password-Form -->
-
-  <!-- Scripts -->
   <script src="assets/js/jquery.min.js"></script>
   <script src="assets/js/bootstrap.min.js"></script>
   <script src="assets/js/interface.js"></script>
-  <!--Switcher-->
   <script src="assets/switcher/js/switcher.js"></script>
-  <!--bootstrap-slider-JS-->
   <script src="assets/js/bootstrap-slider.min.js"></script>
-  <!--Slider-JS-->
   <script src="assets/js/slick.min.js"></script>
   <script src="assets/js/owl.carousel.min.js"></script>
 

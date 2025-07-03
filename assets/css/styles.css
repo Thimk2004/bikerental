@@ -5458,3 +5458,189 @@ h5 {
 
 
 }
+
+/*================
+	 2. Header
+===========================*/
+
+/* 覆蓋現有 .default-header 的 padding，確保 flex 佈局有足夠空間 */
+.default-header {
+    padding: 10px 0 !important; /* 調整為更適合頂部內容的內邊距 */
+}
+
+/* 調整頂部 Header 的主行佈局 */
+.default-header .container .row { /* 針對 .default-header 內部的直接 .row */
+    display: flex !important;
+    align-items: center !important; /* 垂直居中對齊所有欄位 */
+    justify-content: space-between !important; /* 將內容分佈到兩端 */
+    width: 100% !important; /* 確保佔滿可用寬度 */
+    margin-left: 0 !important; /* 移除 Bootstrap 預設的負外邊距 */
+    margin-right: 0 !important;
+}
+
+/* 調整 Logo 欄位 */
+/* 使用你 header.php 中為 Logo 所在的 col 設置的 class，例如 .col-sm-3.col-md-2 */
+.default-header .container .row > .col-sm-3.col-md-2 { /* 針對 Logo 所在的 Bootstrap 欄位 */
+    flex: 0 0 auto !important; /* 不會伸縮，寬度由內容決定 */
+    width: auto !important;
+    max-width: none !important; /* 移除最大寬度限制 */
+    padding-left: 15px !important; /* 恢復 Bootstrap 預設內邊距 */
+    padding-right: 15px !important;
+    text-align: left !important; /* Logo 靠左對齊 */
+}
+.logo { /* 確保 logo 自身不浮動 */
+    float: none !important;
+}
+
+.logo img {
+    max-height: 60px; /* 設定 Logo 的最大高度，你可以根據需要調整這個值 */
+    width: auto; /* 保持圖片的原始寬高比 */
+    display: block; /* 確保圖片作為塊級元素，消除潛在的底部空白 */
+}
+
+/* 針對小屏幕的響應式調整 */
+@media (max-width: 767px) { 
+    .logo img {
+        max-height: 45px; /* 在手機上可以稍微縮小 Logo */
+    }
+}
+
+/* 口號欄位樣式 */
+/* 使用你 header.php 中為口號所在的 col 設置的 class，例如 .col-sm-6.col-md-8 */
+.default-header .container .row > .col-sm-6.col-md-8 { /* 針對口號所在的 Bootstrap 欄位 */
+    flex-grow: 1 !important; /* 讓口號欄位佔據中間的剩餘空間 */
+    text-align: center !important; /* 確保口號文本居中 */
+    padding-left: 15px !important; /* 恢復 Bootstrap 預設內邊距 */
+    padding-right: 15px !important;
+}
+
+.site-slogan {
+    font-size: 1.1em !important; /* 調整字體大小 */
+    color: #555 !important; /* 調整顏色 */
+    font-weight: bold !important;
+    white-space: nowrap !important; /* 防止口號文本換行 */
+    margin: 0 !important; /* 移除任何預設外邊距 */
+    line-height: normal !important; /* 確保行高正常 */
+}
+
+/* 按鈕欄位樣式 */
+/* 使用你 header.php 中為按鈕所在的 col 設置的 class，例如 .col-sm-3.col-md-2 */
+.default-header .container .row > .col-sm-3.col-md-2.buttons-column { /* 針對按鈕所在的 Bootstrap 欄位 */
+    flex: 0 0 auto !important; /* 不會伸縮，寬度由內容決定 */
+    width: auto !important;
+    max-width: none !important; /* 移除最大寬度限制 */
+    padding-left: 15px !important; /* 恢復 Bootstrap 預設內邊距 */
+    padding-right: 15px !important;
+    text-align: right !important; /* 按鈕組靠右對齊 */
+}
+
+/* header_info 現在只包含按鈕組，並將其內容右對齊 */
+.header_info {
+    float: none !important; /* 覆蓋舊的浮動 */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important; /* 將按鈕推到最右邊 */
+    width: 100% !important; /* 確保佔滿其父欄位的寬度 */
+    height: 100% !important;
+    padding: 0 !important; /* 移除 header_info 自身的內邊距 */
+}
+
+/* 按鈕組的樣式 */
+.header-buttons-group { /* 這個是你 header.php 中新加的 class */
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important; /* 按鈕之間的間距 */
+}
+
+/* 隱藏舊的 header_widgets，因為我們不再需要 Email/電話圖標 */
+.header_info .header_widgets {
+    display: none !important;
+}
+
+/* 「Post Your Bike」按鈕樣式 */
+.post-bike-btn .btn {
+    background-color: #dc3545 !important; /* 顯眼的紅色背景 */
+    color: #fff !important;
+    border-radius: 5px !important;
+    padding: 8px 15px !important;
+    font-weight: bold !important;
+    transition: background-color 0.3s ease !important;
+    white-space: nowrap !important; /* 防止按鈕文本換行 */
+    line-height: normal !important; /* 確保按鈕文本行高正常 */
+    height: auto !important; /* 確保按鈕高度自適應內容 */
+}
+
+.post-bike-btn .btn:hover {
+    background-color: #c82333 !important; /* 懸停時顏色變深 */
+}
+
+/* 「Login / Register」按鈕樣式 */
+.login_btn .btn {
+    background-color: #007bff !important; /* 藍色背景 */
+    color: #fff !important;
+    border-radius: 5px !important;
+    padding: 8px 15px !important;
+    font-weight: bold !important;
+    transition: background-color 0.3s ease !important;
+    white-space: nowrap !important; /* 防止按鈕文本換行 */
+    line-height: normal !important; /* 確保按鈕文本行高正常 */
+    height: auto !important; /* 確保按鈕高度自適應內容 */
+}
+
+.login_btn .btn:hover {
+    background-color: #0056b3 !important;
+}
+
+/* 登入狀態的歡迎訊息樣式 */
+.login_status {
+    color: #616ae5 !important; /* 確保登入後的歡迎訊息可見 */
+    font-weight: bold !important;
+    white-space: nowrap !important; /* 防止文本換行 */
+    margin-right: 0 !important; /* 移除任何可能衝突的外邊距 */
+    line-height: normal !important; /* 確保行高正常 */
+}
+
+/* 調整 header_search 的位置 (它在 navigation_bar 內部，與 header_info 獨立) */
+/* 這裡的樣式保持不變，因為它不屬於 header_info 的直接子元素 */
+
+
+/* 響應式調整 */
+@media (max-width: 991px) { /* For tablet and smaller screens */
+    .default-header .container .row { /* 針對頂部主行 */
+        flex-direction: column !important; /* 在小屏幕上垂直堆疊所有欄位 */
+        align-items: center !important; /* 居中對齊 */
+    }
+    .logo-column,
+    .slogan-column,
+    .buttons-column {
+        width: 100% !important; /* 堆疊後佔滿寬度 */
+        max-width: 100% !important;
+        text-align: center !important; /* 內容居中 */
+        margin-bottom: 10px !important; /* 增加垂直間距 */
+        padding-left: 0 !important; /* 移除內邊距 */
+        padding-right: 0 !important;
+    }
+    .slogan-column {
+        order: -1 !important; /* 將口號放在最上面 */
+        margin-bottom: 10px !important;
+        font-size: 1em !important; /* 調整小屏幕字體大小 */
+    }
+    .header_info {
+        justify-content: center !important; /* 按鈕組在小屏幕上居中 */
+    }
+    .header-buttons-group {
+        flex-direction: column !important; /* 按鈕垂直堆疊 */
+        gap: 10px !important;
+    }
+    .post-bike-btn,
+    .login_btn,
+    .login_status {
+        width: 100% !important; /* 按鈕佔滿寬度 */
+        text-align: center !important;
+    }
+}
+
+@media (max-width: 767px) { /* For mobile screens, further adjustments if needed */
+    /* 這裡可以添加更具體的移動端樣式 */
+}
+

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 01, 2025 at 09:44 AM
+-- Generation Time: Jul 03, 2025 at 06:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -251,7 +251,32 @@ INSERT INTO `tblusers` (`id`, `FullName`, `EmailId`, `Password`, `ContactNo`, `d
 (1, 'Harry Den', 'demo@gmail.com', 'f925916e2754e5e03f75dd58a5733251', '2147483647', NULL, NULL, NULL, NULL, '2017-06-17 19:59:27', '2017-06-26 21:02:58'),
 (2, 'AK', 'anuj@gmail.com', 'f925916e2754e5e03f75dd58a5733251', '8285703354', NULL, NULL, NULL, NULL, '2017-06-17 20:00:49', '2017-06-26 21:03:09'),
 (3, 'Mark K', 'webhostingamigo@gmail.com', 'f09df7868d52e12bba658982dbd79821', '09999857868', '03/02/1990', 'PKL', 'PKL', 'PKL', '2017-06-17 20:01:43', '2017-06-17 21:07:41'),
-(4, 'Tom K', 'test@gmail.com', '5c428d8875d2948607f3e3fe134d71b4', '9999857868', '', 'PKL', 'XYZ', 'XYZ', '2017-06-17 20:03:36', '2017-06-26 19:18:14');
+(4, 'Tom K', 'test@gmail.com', '5c428d8875d2948607f3e3fe134d71b4', '9999857868', '', 'PKL', 'XYZ', 'XYZ', '2017-06-17 20:03:36', '2017-06-26 19:18:14'),
+(5, 'Kwan King Foon', 'Aug1233@stu.vtc.edu.hk', 'e10adc3949ba59abbe56e057f20f883e', '91555523', NULL, NULL, NULL, NULL, '2025-07-03 08:04:29', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbluser_contacts`
+--
+
+CREATE TABLE `tbluser_contacts` (
+  `id` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `ContactType` varchar(50) NOT NULL,
+  `ContactValue` varchar(255) NOT NULL,
+  `Description` text DEFAULT NULL,
+  `IsPreferred` tinyint(1) DEFAULT 0,
+  `CreationDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbluser_contacts`
+--
+
+INSERT INTO `tbluser_contacts` (`id`, `UserId`, `ContactType`, `ContactValue`, `Description`, `IsPreferred`, `CreationDate`, `UpdationDate`) VALUES
+(1, 5, 'Phone', '23254168', 'Whatsapp or phone', 0, '2025-07-03 16:06:51', NULL);
 
 -- --------------------------------------------------------
 
@@ -263,6 +288,7 @@ CREATE TABLE `tblvehicles` (
   `id` int(11) NOT NULL,
   `VehiclesTitle` varchar(150) DEFAULT NULL,
   `VehiclesBrand` int(11) DEFAULT NULL,
+  `UserId` int(11) DEFAULT NULL,
   `BikeType` varchar(50) DEFAULT NULL,
   `VehiclesOverview` longtext DEFAULT NULL,
   `PricePerDay` int(11) DEFAULT NULL,
@@ -296,9 +322,25 @@ CREATE TABLE `tblvehicles` (
 -- Dumping data for table `tblvehicles`
 --
 
-INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `BikeType`, `VehiclesOverview`, `PricePerDay`, `FuelType`, `EngineDisplacement`, `ModelYear`, `SeatingCapacity`, `TransactionCount`, `Vimage1`, `Vimage2`, `Vimage3`, `Vimage4`, `Vimage5`, `AirConditioner`, `PowerDoorLocks`, `AntiLockBrakingSystem`, `BrakeAssist`, `PowerSteering`, `DriverAirbag`, `PassengerAirbag`, `PowerWindows`, `CDPlayer`, `CentralLocking`, `CrashSensor`, `LeatherSeats`, `RegDate`, `UpdationDate`) VALUES
-(6, '1123', 3, 'Naked', 'honda PCX160', 100, 'Petrol', 160, 2025, 2, 2, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-24 12:23:23', '2025-07-01 06:40:31'),
-(7, 'CB400 3', 3, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-06-26 18:28:40');
+INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `UserId`, `BikeType`, `VehiclesOverview`, `PricePerDay`, `FuelType`, `EngineDisplacement`, `ModelYear`, `SeatingCapacity`, `TransactionCount`, `Vimage1`, `Vimage2`, `Vimage3`, `Vimage4`, `Vimage5`, `AirConditioner`, `PowerDoorLocks`, `AntiLockBrakingSystem`, `BrakeAssist`, `PowerSteering`, `DriverAirbag`, `PassengerAirbag`, `PowerWindows`, `CDPlayer`, `CentralLocking`, `CrashSensor`, `LeatherSeats`, `RegDate`, `UpdationDate`) VALUES
+(6, '1123', 3, 5, 'Naked', 'honda PCX160', 100, 'Petrol', 160, 2025, 2, 2, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-24 12:23:23', '2025-07-03 16:07:20'),
+(7, 'CB400 3', 3, NULL, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-06-26 18:28:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblvehicle_activity_log`
+--
+
+CREATE TABLE `tblvehicle_activity_log` (
+  `id` int(11) NOT NULL,
+  `VehicleId` int(11) NOT NULL,
+  `UserId` int(11) DEFAULT NULL,
+  `AdminId` int(11) DEFAULT NULL,
+  `ActionType` varchar(100) NOT NULL,
+  `ActionDescription` text DEFAULT NULL,
+  `ActionDate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -365,10 +407,27 @@ ALTER TABLE `tblusers`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tbluser_contacts`
+--
+ALTER TABLE `tbluser_contacts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `UserId` (`UserId`);
+
+--
 -- Indexes for table `tblvehicles`
 --
 ALTER TABLE `tblvehicles`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_user_vehicle` (`UserId`);
+
+--
+-- Indexes for table `tblvehicle_activity_log`
+--
+ALTER TABLE `tblvehicle_activity_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `VehicleId` (`VehicleId`),
+  ADD KEY `UserId` (`UserId`),
+  ADD KEY `AdminId` (`AdminId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -432,13 +491,49 @@ ALTER TABLE `tbltestimonial`
 -- AUTO_INCREMENT for table `tblusers`
 --
 ALTER TABLE `tblusers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `tbluser_contacts`
+--
+ALTER TABLE `tbluser_contacts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblvehicles`
 --
 ALTER TABLE `tblvehicles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `tblvehicle_activity_log`
+--
+ALTER TABLE `tblvehicle_activity_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `tbluser_contacts`
+--
+ALTER TABLE `tbluser_contacts`
+  ADD CONSTRAINT `tbluser_contacts_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `tblusers` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `tblvehicles`
+--
+ALTER TABLE `tblvehicles`
+  ADD CONSTRAINT `fk_user_vehicle` FOREIGN KEY (`UserId`) REFERENCES `tblusers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tblvehicle_activity_log`
+--
+ALTER TABLE `tblvehicle_activity_log`
+  ADD CONSTRAINT `tblvehicle_activity_log_ibfk_1` FOREIGN KEY (`VehicleId`) REFERENCES `tblvehicles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tblvehicle_activity_log_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `tblusers` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `tblvehicle_activity_log_ibfk_3` FOREIGN KEY (`AdminId`) REFERENCES `admin` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

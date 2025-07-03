@@ -8,41 +8,38 @@
 <header>
   <div class="default-header">
     <div class="container">
-      <div class="row">
-        <div class="col-sm-3 col-md-2">
-          <div class="logo"> <a href="index.php"><img src="assets/images/logg2.png" alt="image"/></a> </div>
+      <div class="row header-top-row"> <!-- 新增 custom class 'header-top-row' 用於 CSS 定位 -->
+        <div class="col-sm-3 col-md-2 logo-column"> <!-- Logo 欄位 -->
+          <div class="logo"> <a href="index.php"><img src="assets/images/logg2.png" alt="image" /></a> </div>
         </div>
-        <div class="col-sm-9 col-md-10">
-          <div class="header_info">
-            <div class="header_widgets">
-              <div class="circle_icon"> <i class="fa fa-envelope" aria-hidden="true"></i> </div>
-              <p class="uppercase_text">For Support Mail us : </p>
-              <a href="mailto:info@example.com">codeprojectsorg@gmail.com</a> </div>
-            <div class="header_widgets">
-              <div class="circle_icon"> <i class="fa fa-phone" aria-hidden="true"></i> </div>
-              <p class="uppercase_text">Service Helpline Call Us: </p>
-              <a href="tel:61-1234-5678-09">+91-9876543210</a> </div>
-            <div class="social-follow">
-              <ul>
-                <li><a href="https://code-projects.org/"><i class="fa fa-facebook-square" aria-hidden="true"></i></a></li>
-                <li><a href="https://code-projects.org/"><i class="fa fa-twitter-square" aria-hidden="true"></i></a></li>
-                <li><a href="https://code-projects.org/"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a></li>
-                <li><a href="https://code-projects.org/"><i class="fa fa-google-plus-square" aria-hidden="true"></i></a></li>
-                <li><a href="https://code-projects.org/"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-              </ul>
-            </div>
-   <?php
-   // 修正點 1: 檢查 $_SESSION['login'] 是否存在且其長度為 0
-   // 如果不存在，則視為未登入狀態
-   if(!isset($_SESSION['login']) || strlen($_SESSION['login']) == 0)
-	{
-?>
- <div class="login_btn"> <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal" data-dismiss="modal">Login / Register</a> </div>
-<?php }
-else{
-    // 如果 $_SESSION['login'] 存在且不為空，表示已登入
-    echo "Welcome To Bike rental portal";
- } ?>
+        <div class="col-sm-6 col-md-8 slogan-column"> <!-- 口號欄位 -->
+          <div class="site-slogan">Ride Smart, Buy Pre-Loved.</div>
+        </div>
+        <div class="col-sm-3 col-md-2 buttons-column"> <!-- 按鈕欄位 -->
+          <div class="header_info"> <!-- header_info 現在只包含按鈕組 -->
+            <!-- 舊的 header_widgets 區塊已移除 -->
+
+            <div class="header-buttons-group"> <!-- 按鈕組容器 -->
+              <!-- 「Post Your Bike」按鈕 -->
+              <div class="post-bike-btn">
+                <?php if (isset($_SESSION['login']) && strlen($_SESSION['login']) > 0) { ?>
+                  <!-- 如果已登入，連結到發布電單車頁面 -->
+                  <a href="admin/post-avehical.php" class="btn btn-xs uppercase">Post Your Bike</a>
+                <?php } else { ?>
+                  <!-- 如果未登入，點擊按鈕彈出登入/註冊模態框 -->
+                  <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal" data-dismiss="modal">Post Your Bike</a>
+                <?php } ?>
+              </div>
+
+              <?php
+              // 登入/註冊或歡迎訊息
+              if (!isset($_SESSION['login']) || strlen($_SESSION['login']) == 0) {
+              ?>
+                <div class="login_btn"> <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal" data-dismiss="modal">Login / Register</a> </div>
+              <?php } else {
+                echo "<div class='login_status'>Welcome To A+ motorbike</div>"; // 使用 div 包裹，方便樣式控制
+              } ?>
+            </div> <!-- End of header-buttons-group -->
           </div>
         </div>
       </div>
@@ -58,47 +55,45 @@ else{
         <div class="user_login">
           <ul>
             <li class="dropdown"> <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle" aria-hidden="true"></i>
-<?php
-// 修正點 2: 檢查 $_SESSION['login'] 是否存在且不為空
-if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
-    $email = $_SESSION['login'];
-    $sql ="SELECT FullName FROM tblusers WHERE EmailId=:email ";
-    $query= $dbh -> prepare($sql);
-    $query-> bindParam(':email', $email, PDO::PARAM_STR);
-    $query-> execute();
-    $results=$query->fetchAll(PDO::FETCH_OBJ);
-    if($query->rowCount() > 0)
-    {
-        foreach($results as $result)
-        {
-            echo htmlentities($result->FullName);
-        }
-    } else {
-        echo "Guest"; // 如果找不到使用者名稱，顯示 "Guest"
-    }
-} else {
-    echo "Guest"; // 如果未登入，顯示 "Guest"
-}
-?><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                <?php
+                // 檢查 $_SESSION['login'] 是否存在且不為空
+                if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
+                  $email = $_SESSION['login'];
+                  $sql = "SELECT FullName FROM tblusers WHERE EmailId=:email ";
+                  $query = $dbh->prepare($sql);
+                  $query->bindParam(':email', $email, PDO::PARAM_STR);
+                  $query->execute();
+                  $results = $query->fetchAll(PDO::FETCH_OBJ);
+                  if ($query->rowCount() > 0) {
+                    foreach ($results as $result) {
+                      echo htmlentities($result->FullName);
+                    }
+                  } else {
+                    echo "Guest"; // 如果找不到使用者名稱，顯示 "Guest"
+                  }
+                } else {
+                  echo "Guest"; // 如果未登入，顯示 "Guest"
+                }
+                ?><i class="fa fa-angle-down" aria-hidden="true"></i></a>
               <ul class="dropdown-menu">
-           <?php
-           // 修正點 3: 檢查 $_SESSION['login'] 是否存在且為真 (已登入)
-           if(isset($_SESSION['login']) && $_SESSION['login']){?>
-            <li><a href="profile.php">Profile Settings</a></li>
-              <li><a href="update-password.php">Update Password</a></li>
-            <li><a href="my-booking.php">My Booking</a></li>
-            <li><a href="post-testimonial.php">Post a Testimonial</a></li>
-          <li><a href="my-testimonials.php">My Testimonial</a></li>
-            <li><a href="logout.php">Sign Out</a></li>
-            <?php } else { ?>
-            <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">Profile Settings</a></li>
-              <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">Update Password</a></li>
-            <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">My Booking</a></li>
-            <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">Post a Testimonial</a></li>
-          <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">My Testimonial</a></li>
-            <li><a href="#loginform"  data-toggle="modal" data-dismiss="modal">Sign Out</a></li>
-            <?php } ?>
-          </ul>
+                <?php
+                // 檢查 $_SESSION['login'] 是否存在且為真 (已登入)
+                if (isset($_SESSION['login']) && $_SESSION['login']) { ?>
+                  <li><a href="profile.php">Profile Settings</a></li>
+                  <li><a href="update-password.php">Update Password</a></li>
+                  <li><a href="my-booking.php">My Booking</a></li>
+                  <li><a href="post-testimonial.php">Post a Testimonial</a></li>
+                  <li><a href="my-testimonials.php">My Testimonial</a></li>
+                  <li><a href="logout.php">Sign Out</a></li>
+                <?php } else { ?>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">Profile Settings</a></li>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">Update Password</a></li>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">My Booking</a></li>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">Post a Testimonial</a></li>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">My Testimonial</a></li>
+                  <li><a href="#loginform" data-toggle="modal" data-dismiss="modal">Sign Out</a></li>
+                <?php } ?>
+              </ul>
             </li>
           </ul>
         </div>
@@ -112,7 +107,7 @@ if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
       </div>
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="nav navbar-nav">
-          <li><a href="index.php">Home</a>    </li>
+          <li><a href="index.php">Home</a> </li>
           <li><a href="page.php?type=aboutus">About Us</a></li>
           <li class="dropdown"><a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">MARKET <i aria-hidden="true"></i></a>
             <ul class="dropdown-menu">
@@ -127,4 +122,4 @@ if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
       </div>
     </div>
   </nav>
-  </header>
+</header>

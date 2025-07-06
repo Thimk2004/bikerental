@@ -57,7 +57,8 @@ $transaction_count_range = isset($_GET['transaction_count_range']) ? $_GET['tran
 
 
 // 構建 SQL 查詢基礎
-$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE 1";
+// Added WHERE tv.IsActive = 1 to only show active vehicles
+$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE tv.IsActive = 1";
 $params = []; // 用於 PDO 綁定參數
 
 // 應用篩選條件

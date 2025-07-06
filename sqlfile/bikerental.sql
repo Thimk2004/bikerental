@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 03, 2025 at 06:09 PM
+-- Generation Time: Jul 06, 2025 at 11:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -252,7 +252,8 @@ INSERT INTO `tblusers` (`id`, `FullName`, `EmailId`, `Password`, `ContactNo`, `d
 (2, 'AK', 'anuj@gmail.com', 'f925916e2754e5e03f75dd58a5733251', '8285703354', NULL, NULL, NULL, NULL, '2017-06-17 20:00:49', '2017-06-26 21:03:09'),
 (3, 'Mark K', 'webhostingamigo@gmail.com', 'f09df7868d52e12bba658982dbd79821', '09999857868', '03/02/1990', 'PKL', 'PKL', 'PKL', '2017-06-17 20:01:43', '2017-06-17 21:07:41'),
 (4, 'Tom K', 'test@gmail.com', '5c428d8875d2948607f3e3fe134d71b4', '9999857868', '', 'PKL', 'XYZ', 'XYZ', '2017-06-17 20:03:36', '2017-06-26 19:18:14'),
-(5, 'Kwan King Foon', 'Aug1233@stu.vtc.edu.hk', 'e10adc3949ba59abbe56e057f20f883e', '91555523', NULL, NULL, NULL, NULL, '2025-07-03 08:04:29', NULL);
+(5, 'Kwan King Foon', 'Aug1233@stu.vtc.edu.hk', 'e10adc3949ba59abbe56e057f20f883e', '91555523', NULL, NULL, NULL, NULL, '2025-07-03 08:04:29', NULL),
+(6, 'RC C', 'tihiba8420@axcradio.com', '6048a32c51ce9aa0e2d30cf74db3d59a', '26100146', NULL, NULL, NULL, NULL, '2025-07-06 09:14:06', NULL);
 
 -- --------------------------------------------------------
 
@@ -276,7 +277,8 @@ CREATE TABLE `tbluser_contacts` (
 --
 
 INSERT INTO `tbluser_contacts` (`id`, `UserId`, `ContactType`, `ContactValue`, `Description`, `IsPreferred`, `CreationDate`, `UpdationDate`) VALUES
-(1, 5, 'Phone', '23254168', 'Whatsapp or phone', 0, '2025-07-03 16:06:51', NULL);
+(1, 5, 'Phone', '23254168', 'Whatsapp or phone', 0, '2025-07-03 16:06:51', NULL),
+(4, 2, 'email', 'captmichael@ymail.com', 'mr a', 0, '2025-07-06 08:58:22', NULL);
 
 -- --------------------------------------------------------
 
@@ -324,7 +326,11 @@ CREATE TABLE `tblvehicles` (
 
 INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `UserId`, `BikeType`, `VehiclesOverview`, `PricePerDay`, `FuelType`, `EngineDisplacement`, `ModelYear`, `SeatingCapacity`, `TransactionCount`, `Vimage1`, `Vimage2`, `Vimage3`, `Vimage4`, `Vimage5`, `AirConditioner`, `PowerDoorLocks`, `AntiLockBrakingSystem`, `BrakeAssist`, `PowerSteering`, `DriverAirbag`, `PassengerAirbag`, `PowerWindows`, `CDPlayer`, `CentralLocking`, `CrashSensor`, `LeatherSeats`, `RegDate`, `UpdationDate`) VALUES
 (6, '1123', 3, 5, 'Naked', 'honda PCX160', 100, 'Petrol', 160, 2025, 2, 2, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-24 12:23:23', '2025-07-03 16:07:20'),
-(7, 'CB400 3', 3, NULL, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-06-26 18:28:40');
+(7, 'CB400 3', 3, 5, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-07-03 16:19:03'),
+(10, 'NINJA 300', 4, NULL, 'Sports', '??TEST', 16000, 'Petrol', 300, 2012, 2, 4, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-04 08:44:13', NULL),
+(17, 'AUGUR', 5, 2, 'Scooter', '123', 500, 'Petrol', 155, 2023, 2, 0, 'new-yamaha-augur-155cc-scooter-specs-colour-4.jpg', '', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-04 09:50:22', '2025-07-05 18:57:59'),
+(18, 'NINJA 300', 4, NULL, 'Sports', 'Test 2', 10000, 'Petrol', 300, 2020, 2, 5, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-05 10:44:47', NULL),
+(19, 'NINJA 300', 4, 2, 'Sports', 'suzuki ninja 300', 300, 'Petrol', 300, 2020, 2, 4, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-05 17:04:45', NULL);
 
 -- --------------------------------------------------------
 
@@ -491,19 +497,19 @@ ALTER TABLE `tbltestimonial`
 -- AUTO_INCREMENT for table `tblusers`
 --
 ALTER TABLE `tblusers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbluser_contacts`
 --
 ALTER TABLE `tbluser_contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblvehicles`
 --
 ALTER TABLE `tblvehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tblvehicle_activity_log`

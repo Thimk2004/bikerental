@@ -24,7 +24,7 @@
               <div class="post-bike-btn">
                 <?php if (isset($_SESSION['login']) && strlen($_SESSION['login']) > 0) { ?>
                   <!-- 如果已登入，連結到發布電單車頁面 -->
-                  <a href="admin/post-avehical.php" class="btn btn-xs uppercase">Post Your Bike</a>
+                  <a href="post-bike.php" class="btn btn-xs uppercase">Post Your Bike</a> <!-- 連結已修改為 post-bike.php -->
                 <?php } else { ?>
                   <!-- 如果未登入，點擊按鈕彈出登入/註冊模態框 -->
                   <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal" data-dismiss="modal">Post Your Bike</a>

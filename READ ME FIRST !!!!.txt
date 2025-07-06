@@ -4,10 +4,14 @@ USERNAME : test@gmail.com
 
 PASSWORD : Test@12345
 
+New: tihiba8420@axcradio.com
+
+PW: A123123
+
 
 For Admin Panel
 
-Open Your browser put inside browser “http://localhost/bikerental/admin”
+Open Your browser put inside browser ï¿½http://localhost/bikerental/adminï¿½
 
 USERNAME : admin
 

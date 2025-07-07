@@ -31,7 +31,30 @@ if(strlen($_SESSION['login']) == 0) {
         exit(); // It's critical to exit here if user ID isn't found
     }
 
-    // --- 2. Process Form Submission ---
+    // --- Handle "Delete Post" action ---
+    if (isset($_POST['delete_post'])) {
+        // SQL DELETE statement for tblvehicles
+        $sql_delete_vehicle = "DELETE FROM tblvehicles WHERE id = :id AND UserId = :userid_check";
+        $query_delete_vehicle = $dbh->prepare($sql_delete_vehicle);
+        $query_delete_vehicle->bindParam(':id', $id, PDO::PARAM_INT);
+        $query_delete_vehicle->bindParam(':userid_check', $userIdForAuth, PDO::PARAM_INT);
+        try {
+            $query_delete_vehicle->execute();
+            if ($query_delete_vehicle->rowCount() > 0) {
+                $msg = "Post successfully deleted!";
+                // Redirect to my-post.php after deletion
+                // 使用絕對路徑確保重定向正確
+                header('location: /bikerental/my-post.php?msg=' . urlencode($msg));
+                exit();
+            } else {
+                $error = "Failed to delete post. Ensure you are the owner.";
+            }
+        } catch (PDOException $e) {
+            $error = "Database error while deleting post: " . $e->getMessage();
+        }
+    }
+
+    // --- 2. Process Form Submission (Save Changes) ---
     if(isset($_POST['submit'])) {
         // Get all form fields' values
         $vehicletitle = $_POST['vehicletitle'];
@@ -162,6 +185,7 @@ if(strlen($_SESSION['login']) == 0) {
 
     // --- 3. Retrieve current vehicle details, including owner info and additional contact methods ---
     // IMPORTANT: Added UserId to WHERE clause for authorization
+    // Note: If you remove IsActive column, you don't need to check it here.
     $sql_vehicle_data = "SELECT tv.*, tb.BrandName, tb.id as bid, tu.FullName, tu.EmailId, tu.id as seller_userid
                          FROM tblvehicles tv
                          JOIN tblbrands tb ON tb.id=tv.VehiclesBrand
@@ -175,7 +199,7 @@ if(strlen($_SESSION['login']) == 0) {
 
     // If vehicle data is not found or user is not authorized, redirect
     if (!$vehicle_data) {
-        header('location: my-vehicles.php'); // Or a suitable "Access Denied" page
+        header('location: my-post.php'); // Or a suitable "Access Denied" page
         exit();
     }
 
@@ -761,6 +785,8 @@ if(strlen($_SESSION['login']) == 0) {
         <div class="form-group">
             <div class="col-sm-8 col-sm-offset-2" >
                 <button class="btn btn-primary" name="submit" type="submit" style="margin-top:4%">Save changes</button>
+                <!-- 更改為 "Delete My Post" 按鈕 -->
+                <button class="btn btn-danger" name="delete_post" type="submit" style="margin-top:4%; margin-left:10px;" onclick="return confirm('Are you sure you want to PERMANENTLY delete this post? This action cannot be undone.');">Delete My Post</button>
             </div>
         </div>
 

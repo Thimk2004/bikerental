@@ -1,7 +1,5 @@
 <?php
 session_start();
-// error_reporting(E_ALL); // 關閉所有錯誤報告，正式環境建議開啟或設定為 E_ALL & ~E_NOTICE
-// ini_set('display_errors', 1); // 關閉錯誤顯示
 error_reporting(0); // 正式環境建議關閉所有錯誤報告
 include('includes/config.php');
 
@@ -43,14 +41,13 @@ $max_price = (isset($_GET['max_price']) && $_GET['max_price'] !== '') ? intval($
 
 // 從數據庫獲取品牌列表
 $brands_from_db = [];
-// 移除 try-catch，因為這部分通常不會是主要問題來源，且錯誤會在主查詢中捕獲
 $ret_brands = "SELECT id, BrandName FROM tblbrands ORDER BY BrandName ASC";
 $query_brands = $dbh->prepare($ret_brands);
 $query_brands->execute();
 $result_brands = $query_brands->fetchAll(PDO::FETCH_OBJ);
-if (!empty($result_brands)) { // 使用 !empty() 檢查結果
+if (!empty($result_brands)) {
     foreach ($result_brands as $brand) {
-        $brands_from_db[$brand->id] = $brand->BrandName; // 儲存為 ID => Name 的映射
+        $brands_from_db[$brand->id] = $brand->BrandName;
     }
 }
 
@@ -58,21 +55,20 @@ if (!empty($result_brands)) { // 使用 !empty() 檢查結果
 // 構建 SQL 查詢基礎
 $sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id";
 $params = []; // 用於 PDO 綁定參數
-$where_clauses = ["tv.IsActive = 1"]; // 始終包含此條件
+$where_clauses = []; // 移除 tv.IsActive = 1 條件
 
 // 應用篩選條件
-if ($selected_type !== null) { // 檢查是否為 null
-    // 檢查 $selected_type 是否在 $bike_types 數組中，以防止注入無效值
+if ($selected_type !== null) {
     if (in_array($selected_type, $bike_types)) {
         $where_clauses[] = "tv.BikeType = :biketype";
         $params[':biketype'] = $selected_type;
     }
 }
-if ($selected_brand_id !== null) { // 檢查是否為 null
+if ($selected_brand_id !== null) {
     $where_clauses[] = "tv.VehiclesBrand = :brand_id";
     $params[':brand_id'] = $selected_brand_id;
 }
-if ($selected_model_year !== null) { // 檢查是否為 null
+if ($selected_model_year !== null) {
     $where_clauses[] = "tv.ModelYear = :modelyear";
     $params[':modelyear'] = $selected_model_year;
 }
@@ -86,7 +82,7 @@ if ($max_price !== null) {
 }
 
 // 排氣量篩選
-if ($selected_engine_displacement !== null) { // 檢查是否為 null
+if ($selected_engine_displacement !== null) {
     if ($selected_engine_displacement === '1001-over') {
         $where_clauses[] = "tv.EngineDisplacement >= 1001";
     } else {
@@ -97,7 +93,7 @@ if ($selected_engine_displacement !== null) { // 檢查是否為 null
     }
 }
 // 交易次數篩選 (根據 TransactionCount 字段)
-if ($transaction_count_range !== null) { // 檢查是否為 null
+if ($transaction_count_range !== null) {
     if ($transaction_count_range === '0-0') {
         $where_clauses[] = "tv.TransactionCount = 0";
     } elseif ($transaction_count_range === '11-over') {
@@ -118,7 +114,7 @@ if (!empty($where_clauses)) {
 // 添加排序
 switch ($selected_sort) {
     case 'recent':
-        $sql .= " ORDER BY tv.RegDate DESC"; // 假設 'RegDate' 是記錄創建日期
+        $sql .= " ORDER BY tv.RegDate DESC";
         break;
     case 'price_high_to_low':
         $sql .= " ORDER BY tv.PricePerDay DESC";
@@ -134,11 +130,10 @@ switch ($selected_sort) {
         break;
     case 'default':
     default:
-        $sql .= " ORDER BY tv.RegDate DESC"; // 預設按 RegDate 降序 (最新)
+        $sql .= " ORDER BY tv.RegDate DESC";
         break;
 }
 
-// 在這裡添加 try-catch 塊來處理主查詢
 $vehicles = []; // 初始化 $vehicles 為空陣列，以防查詢失敗
 try {
     if (!$dbh) {
@@ -146,28 +141,18 @@ try {
     }
 
     $query = $dbh->prepare($sql);
-    // 直接將參數陣列傳遞給 execute()，這是推薦的做法
     $query->execute($params); 
-    $vehicles = $query->fetchAll(PDO::FETCH_OBJ); // 這裡只調用一次 fetchAll()
+    $vehicles = $query->fetchAll(PDO::FETCH_OBJ);
 
 } catch (PDOException $e) {
-    // 捕獲 PDO 異常，打印錯誤訊息並記錄日誌
-    // 在生產環境中，你可能希望將這些錯誤記錄到文件而不是直接顯示給用戶
-    echo "<div style='color: red; padding: 10px; border: 1px solid red; background-color: #ffe0e0;'>";
-    echo "<strong>數據庫查詢失敗！</strong><br>";
-    echo "錯誤訊息: " . htmlentities($e->getMessage());
-    echo "<br>請檢查數據庫連接和 SQL 語法。";
-    echo "</div>";
-    // 將錯誤記錄到伺服器日誌中，以便後續分析
+    // 捕獲 PDO 異常，並記錄日誌，但在生產環境中不直接顯示給用戶
     error_log("PDO Exception in bike-listing.php (main query): " . $e->getMessage());
-    // 確保 $vehicles 在錯誤時依然是空陣列，這樣頁面就不會嘗試遍歷未定義的變數
-    $vehicles = [];
+    $vehicles = []; // 確保 $vehicles 在錯誤時依然是空陣列
 }
 
 
 // 從數據庫獲取所有獨特的型號年份，用於篩選下拉菜單
 $model_years = [];
-// 移除 try-catch
 $ret_years = "SELECT DISTINCT ModelYear FROM tblvehicles ORDER BY ModelYear DESC";
 $query_years = $dbh->prepare($ret_years);
 $query_years->execute();

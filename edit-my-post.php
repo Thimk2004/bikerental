@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 include('includes/config.php');
 
-// 1. User Authentication Check (CHANGED from alogin to login)
+// 1. User Authentication Check
 if(strlen($_SESSION['login']) == 0) {
     header('location:index.php'); // Redirect to homepage or login if not logged in
     exit();
@@ -28,8 +28,7 @@ if(strlen($_SESSION['login']) == 0) {
         $userIdForAuth = $user_row_auth->id;
     } else {
         $error = "Error: Your user ID could not be determined. Please log in again.";
-        // It's critical to exit here if user ID isn't found
-        exit();
+        exit(); // It's critical to exit here if user ID isn't found
     }
 
     // --- 2. Process Form Submission ---
@@ -124,14 +123,14 @@ if(strlen($_SESSION['login']) == 0) {
             if ($query->rowCount() > 0) { // Check if any row was updated
                 $msg = "Motorcycle data updated successfully!";
 
-                // --- Handle update of additional contact methods for this VEHICLE ---
-                // 1. Delete all contacts associated with this specific VehicleId from tblvehicle_contacts
-                $sql_delete_contacts = "DELETE FROM tblvehicle_contacts WHERE VehicleId = :vehicleid";
+                // --- Handle update of additional contact methods for the LOGGED-IN USER ---
+                // 1. Delete all contacts associated with this specific UserId from tbluser_contacts
+                $sql_delete_contacts = "DELETE FROM tbluser_contacts WHERE UserId = :userid";
                 $query_delete_contacts = $dbh->prepare($sql_delete_contacts);
-                $query_delete_contacts->bindParam(':vehicleid', $id, PDO::PARAM_INT);
+                $query_delete_contacts->bindParam(':userid', $userIdForAuth, PDO::PARAM_INT); // Delete contacts for the logged-in user
                 $query_delete_contacts->execute();
 
-                // 2. Insert new contact methods
+                // 2. Insert new contact methods for the logged-in user
                 if (isset($_POST['contact_type']) && is_array($_POST['contact_type'])) {
                     $contactTypes = $_POST['contact_type'];
                     $contactValues = $_POST['contact_value'];
@@ -143,9 +142,9 @@ if(strlen($_SESSION['login']) == 0) {
                         $description = trim($contactDescriptions[$i]);
 
                         if (!empty($type) && !empty($value)) {
-                            $sql_insert_contact = "INSERT INTO tblvehicle_contacts(VehicleId, ContactType, ContactValue, Description) VALUES(:vehicleid, :contacttype, :contactvalue, :description)";
+                            $sql_insert_contact = "INSERT INTO tbluser_contacts(UserId, ContactType, ContactValue, Description) VALUES(:userid, :contacttype, :contactvalue, :description)";
                             $query_insert_contact = $dbh->prepare($sql_insert_contact);
-                            $query_insert_contact->bindParam(':vehicleid', $id, PDO::PARAM_INT); // Bind to VehicleId
+                            $query_insert_contact->bindParam(':userid', $userIdForAuth, PDO::PARAM_INT); // Bind to logged-in UserId
                             $query_insert_contact->bindParam(':contacttype', $type, PDO::PARAM_STR);
                             $query_insert_contact->bindParam(':contactvalue', $value, PDO::PARAM_STR);
                             $query_insert_contact->bindParam(':description', $description, PDO::PARAM_STR);
@@ -180,12 +179,12 @@ if(strlen($_SESSION['login']) == 0) {
         exit();
     }
 
-    // Fetch current vehicle contacts (from tblvehicle_contacts)
+    // Fetch current user's contacts (from tbluser_contacts)
     $current_contacts = [];
-    if ($vehicle_data) { // Ensure vehicle data exists before fetching contacts
-        $sql_current_contacts = "SELECT ContactType, ContactValue, Description FROM tblvehicle_contacts WHERE VehicleId = :vehicleid";
+    if ($userIdForAuth) { // Ensure user ID exists before fetching contacts
+        $sql_current_contacts = "SELECT ContactType, ContactValue, Description FROM tbluser_contacts WHERE UserId = :userid";
         $query_current_contacts = $dbh->prepare($sql_current_contacts);
-        $query_current_contacts->bindParam(':vehicleid', $id, PDO::PARAM_INT);
+        $query_current_contacts->bindParam(':userid', $userIdForAuth, PDO::PARAM_INT);
         $query_current_contacts->execute();
         $current_contacts = $query_current_contacts->fetchAll(PDO::FETCH_OBJ);
     }
@@ -367,7 +366,7 @@ if(strlen($_SESSION['login']) == 0) {
             <label class="col-sm-2 control-label">Select Motorcycle Type<span style="color:red">*</span></label>
             <div class="col-sm-4">
                 <select class="selectpicker" name="biketype" required>
-                    <option value="<?php echo htmlentities($vehicle_data->BikeType);?>"><?php echo htmlentities($vehicle_data->BikeType);?> (<?php
+                    <option value="<?php echo htmlentities($vehicle_data->BikeType);?>"><?php echo htmlentities($vehicle_data->BikeType);?> (<?php // 這裡需要根據英文值顯示對應的中文翻譯
                         switch($vehicle_data->BikeType) {
                             case 'Naked': echo '街車'; break;
                             case 'Cruiser': echo '巡航車'; break;

@@ -1,8 +1,8 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1); 
-//error_reporting(0); // 關閉所有錯誤報告，正式環境建議開啟或設定為 E_ALL & ~E_NOTICE
+// error_reporting(E_ALL); // 關閉所有錯誤報告，正式環境建議開啟或設定為 E_ALL & ~E_NOTICE
+// ini_set('display_errors', 1); // 關閉錯誤顯示
+error_reporting(0); // 正式環境建議關閉所有錯誤報告
 include('includes/config.php');
 
 // 定義可用的排序選項
@@ -28,84 +28,91 @@ $engine_displacement_ranges = [
     '801-1000' => '801 - 1000 CC',
     '1001-over' => '1001+ CC'
 ];
-// 初始化排氣量篩選變量
-$selected_engine_displacement = isset($_GET['enginedisplacement']) ? $_GET['enginedisplacement'] : '';
+
+// 初始化篩選變量，從 GET 參數獲取，並確保空值為 null
+$selected_sort = isset($_GET['sort']) && array_key_exists($_GET['sort'], $sort_options) ? $_GET['sort'] : 'default';
+$selected_type = (isset($_GET['type']) && $_GET['type'] !== '') ? $_GET['type'] : null;
+$selected_brand_id = (isset($_GET['brand']) && $_GET['brand'] !== '') ? intval($_GET['brand']) : null;
+$selected_model_year = (isset($_GET['modelyear']) && $_GET['modelyear'] !== '') ? intval($_GET['modelyear']) : null;
+$selected_engine_displacement = (isset($_GET['enginedisplacement']) && $_GET['enginedisplacement'] !== '') ? $_GET['enginedisplacement'] : null;
+$transaction_count_range = (isset($_GET['transaction_count_range']) && $_GET['transaction_count_range'] !== '') ? $_GET['transaction_count_range'] : null;
+
+// 價格篩選：如果輸入框為空，則設為 null，這樣就不會參與 SQL 篩選
+$min_price = (isset($_GET['min_price']) && $_GET['min_price'] !== '') ? intval($_GET['min_price']) : null;
+$max_price = (isset($_GET['max_price']) && $_GET['max_price'] !== '') ? intval($_GET['max_price']) : null;
 
 // 從數據庫獲取品牌列表
 $brands_from_db = [];
+// 移除 try-catch，因為這部分通常不會是主要問題來源，且錯誤會在主查詢中捕獲
 $ret_brands = "SELECT id, BrandName FROM tblbrands ORDER BY BrandName ASC";
 $query_brands = $dbh->prepare($ret_brands);
 $query_brands->execute();
 $result_brands = $query_brands->fetchAll(PDO::FETCH_OBJ);
-if ($query_brands->rowCount() > 0) {
+if (!empty($result_brands)) { // 使用 !empty() 檢查結果
     foreach ($result_brands as $brand) {
         $brands_from_db[$brand->id] = $brand->BrandName; // 儲存為 ID => Name 的映射
     }
 }
 
-// 初始化篩選變量，從 GET 參數獲取
-$selected_sort = isset($_GET['sort']) && array_key_exists($_GET['sort'], $sort_options) ? $_GET['sort'] : 'default';
-$selected_type = isset($_GET['type']) && in_array($_GET['type'], $bike_types) ? $_GET['type'] : '';
-$selected_brand_id = isset($_GET['brand']) ? intval($_GET['brand']) : ''; // 使用品牌 ID 進行篩選
-$selected_model_year = isset($_GET['modelyear']) ? intval($_GET['modelyear']) : '';
-
-// 價格篩選：如果輸入框為空，則設為 null，這樣就不會參與 SQL 篩選
-$min_price = isset($_GET['min_price']) && $_GET['min_price'] !== '' ? intval($_GET['min_price']) : null;
-$max_price = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? intval($_GET['max_price']) : null;
-
-$transaction_count_range = isset($_GET['transaction_count_range']) ? $_GET['transaction_count_range'] : '';
-
 
 // 構建 SQL 查詢基礎
-// Added WHERE tv.IsActive = 1 to only show active vehicles
-$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id WHERE tv.IsActive = 1";
+$sql = "SELECT tv.*, tb.BrandName FROM tblvehicles tv JOIN tblbrands tb ON tv.VehiclesBrand = tb.id";
 $params = []; // 用於 PDO 綁定參數
+$where_clauses = ["tv.IsActive = 1"]; // 始終包含此條件
 
 // 應用篩選條件
-if (!empty($selected_type)) {
-    $sql .= " AND tv.BikeType = :biketype";
-    $params[':biketype'] = $selected_type;
+if ($selected_type !== null) { // 檢查是否為 null
+    // 檢查 $selected_type 是否在 $bike_types 數組中，以防止注入無效值
+    if (in_array($selected_type, $bike_types)) {
+        $where_clauses[] = "tv.BikeType = :biketype";
+        $params[':biketype'] = $selected_type;
+    }
 }
-if (!empty($selected_brand_id)) {
-    $sql .= " AND tv.VehiclesBrand = :brand_id";
+if ($selected_brand_id !== null) { // 檢查是否為 null
+    $where_clauses[] = "tv.VehiclesBrand = :brand_id";
     $params[':brand_id'] = $selected_brand_id;
 }
-if (!empty($selected_model_year)) {
-    $sql .= " AND tv.ModelYear = :modelyear";
+if ($selected_model_year !== null) { // 檢查是否為 null
+    $where_clauses[] = "tv.ModelYear = :modelyear";
     $params[':modelyear'] = $selected_model_year;
 }
-if ($min_price !== null) { // 只有當 min_price 不為 null 時才應用篩選
-    $sql .= " AND tv.PricePerDay >= :minprice";
+if ($min_price !== null) {
+    $where_clauses[] = "tv.PricePerDay >= :minprice";
     $params[':minprice'] = $min_price;
 }
-if ($max_price !== null) { // 只有當 max_price 不為 null 時才應用篩選
-    $sql .= " AND tv.PricePerDay <= :maxprice";
+if ($max_price !== null) {
+    $where_clauses[] = "tv.PricePerDay <= :maxprice";
     $params[':maxprice'] = $max_price;
 }
 
 // 排氣量篩選
-if (!empty($selected_engine_displacement)) {
+if ($selected_engine_displacement !== null) { // 檢查是否為 null
     if ($selected_engine_displacement === '1001-over') {
-        $sql .= " AND tv.EngineDisplacement >= 1001";
+        $where_clauses[] = "tv.EngineDisplacement >= 1001";
     } else {
         list($min_cc, $max_cc) = explode('-', $selected_engine_displacement);
-        $sql .= " AND tv.EngineDisplacement BETWEEN :mincc AND :maxcc";
+        $where_clauses[] = "tv.EngineDisplacement BETWEEN :mincc AND :maxcc";
         $params[':mincc'] = intval($min_cc);
         $params[':maxcc'] = intval($max_cc);
     }
 }
 // 交易次數篩選 (根據 TransactionCount 字段)
-if (!empty($transaction_count_range)) {
+if ($transaction_count_range !== null) { // 檢查是否為 null
     if ($transaction_count_range === '0-0') {
-        $sql .= " AND tv.TransactionCount = 0";
-    } elseif ($transaction_count_range === '11-over') { // 假設 11+ 為一個範圍
-        $sql .= " AND tv.TransactionCount >= 11";
+        $where_clauses[] = "tv.TransactionCount = 0";
+    } elseif ($transaction_count_range === '11-over') {
+        $where_clauses[] = "tv.TransactionCount >= 11";
     } else {
         list($min_tx, $max_tx) = explode('-', $transaction_count_range);
-        $sql .= " AND tv.TransactionCount BETWEEN :mintx AND :maxtx";
+        $where_clauses[] = "tv.TransactionCount BETWEEN :mintx AND :maxtx";
         $params[':mintx'] = intval($min_tx);
         $params[':maxtx'] = intval($max_tx);
     }
+}
+
+// 將所有 WHERE 子句組合起來
+if (!empty($where_clauses)) {
+    $sql .= " WHERE " . implode(" AND ", $where_clauses);
 }
 
 // 添加排序
@@ -131,16 +138,36 @@ switch ($selected_sort) {
         break;
 }
 
-$query = $dbh->prepare($sql);
-// 綁定參數，根據類型選擇 PDO::PARAM_INT 或 PDO::PARAM_STR
-foreach ($params as $key => $val) {
-    $query->bindParam($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+// 在這裡添加 try-catch 塊來處理主查詢
+$vehicles = []; // 初始化 $vehicles 為空陣列，以防查詢失敗
+try {
+    if (!$dbh) {
+        throw new PDOException("數據庫連接對象為空！請檢查 includes/config.php");
+    }
+
+    $query = $dbh->prepare($sql);
+    // 直接將參數陣列傳遞給 execute()，這是推薦的做法
+    $query->execute($params); 
+    $vehicles = $query->fetchAll(PDO::FETCH_OBJ); // 這裡只調用一次 fetchAll()
+
+} catch (PDOException $e) {
+    // 捕獲 PDO 異常，打印錯誤訊息並記錄日誌
+    // 在生產環境中，你可能希望將這些錯誤記錄到文件而不是直接顯示給用戶
+    echo "<div style='color: red; padding: 10px; border: 1px solid red; background-color: #ffe0e0;'>";
+    echo "<strong>數據庫查詢失敗！</strong><br>";
+    echo "錯誤訊息: " . htmlentities($e->getMessage());
+    echo "<br>請檢查數據庫連接和 SQL 語法。";
+    echo "</div>";
+    // 將錯誤記錄到伺服器日誌中，以便後續分析
+    error_log("PDO Exception in bike-listing.php (main query): " . $e->getMessage());
+    // 確保 $vehicles 在錯誤時依然是空陣列，這樣頁面就不會嘗試遍歷未定義的變數
+    $vehicles = [];
 }
-$query->execute();
-$vehicles = $query->fetchAll(PDO::FETCH_OBJ); // 這裡只調用一次 fetchAll()
+
 
 // 從數據庫獲取所有獨特的型號年份，用於篩選下拉菜單
 $model_years = [];
+// 移除 try-catch
 $ret_years = "SELECT DISTINCT ModelYear FROM tblvehicles ORDER BY ModelYear DESC";
 $query_years = $dbh->prepare($ret_years);
 $query_years->execute();
@@ -429,7 +456,7 @@ foreach ($result_years as $year) {
             <div class="form-group">
               <input type="number" class="form-control" id="max_price" name="max_price" placeholder="最高價格" value="<?php echo htmlentities($max_price); ?>">
             </div>
-            
+
             <button type="submit" class="btn btn-primary btn-block">應用篩選</button>
             <a href="bike-listing.php" class="btn btn-default btn-block">清除篩選</a>
           </form>
@@ -440,72 +467,74 @@ foreach ($result_years as $year) {
       <!-- 電單車列表 -->
       <div class="col-md-9 col-sm-8">
         <div class="bike-grid-container">
-          <?php if ($query->rowCount() > 0) {
+          <?php if (!empty($vehicles)) { // 這裡使用 !empty($vehicles) 判斷
               foreach ($vehicles as $vehicle) { ?>
-            <div class="bike-item-card">
-              <?php if (!empty($vehicle->Vimage1)) { ?>
-                <img src="admin/img/vehicleimages/<?php echo htmlentities($vehicle->Vimage1); ?>" alt="<?php echo htmlentities($vehicle->VehiclesTitle); ?>">
-              <?php } else { ?>
-                <img src="https://placehold.co/400x200/cccccc/333333?text=無圖片" alt="無圖片">
-              <?php } ?>
-              <div class="bike-item-content">
-                <h5><?php echo htmlentities($vehicle->VehiclesTitle); ?></h5>
-                <p>品牌: <?php echo htmlentities($vehicle->BrandName); ?></p>
-                <p>類型: <?php echo htmlentities($vehicle->BikeType ?: 'N/A'); ?></p> <!-- 顯示電單車類型 -->
-                <p>Engine: <?php echo htmlentities($vehicle->EngineDisplacement); ?> CC</p>
-                <p>年份: <?php echo htmlentities($vehicle->ModelYear); ?></p>
-                <!-- 假設 TransactionCount 字段存在 -->
-                <?php if (isset($vehicle->TransactionCount)) { ?>
-                    <p>交易次數: <?php echo htmlentities($vehicle->TransactionCount); ?></p>
-                <?php } ?>
-                <div class="bike-item-price">HKD $<?php echo htmlentities($vehicle->PricePerDay); ?></div>
-                <a href="vehical-details.php?vhid=<?php echo htmlentities($vehicle->id); ?>" class="bike-item-link">查看詳情</a>
+                <div class="bike-item-card">
+                  <?php if (!empty($vehicle->Vimage1)) { ?>
+                    <img src="admin/img/vehicleimages/<?php echo htmlentities($vehicle->Vimage1); ?>" alt="<?php echo htmlentities($vehicle->VehiclesTitle); ?>">
+                  <?php } else { ?>
+                    <img src="https://placehold.co/400x200/cccccc/333333?text=無圖片" alt="無圖片">
+                  <?php } ?>
+                  <div class="bike-item-content">
+                    <h5><?php echo htmlentities($vehicle->VehiclesTitle); ?></h5>
+                    <p>品牌: <?php echo htmlentities($vehicle->BrandName); ?></p>
+                    <p>類型: <?php echo htmlentities($vehicle->BikeType ?: 'N/A'); ?></p> <!-- 顯示電單車類型 -->
+                    <p>Engine: <?php echo htmlentities($vehicle->EngineDisplacement); ?> CC</p>
+                    <p>年份: <?php echo htmlentities($vehicle->ModelYear); ?></p>
+                    <!-- 假設 TransactionCount 字段存在 -->
+                    <?php if (isset($vehicle->TransactionCount)) { ?>
+                      <p>交易次數: <?php echo htmlentities($vehicle->TransactionCount); ?></p>
+                    <?php } ?>
+                    <div class="bike-item-price">HKD $<?php echo htmlentities($vehicle->PricePerDay); ?></div>
+                    <a href="vehical-details.php?vhid=<?php echo htmlentities($vehicle->id); ?>" class="bike-item-link">查看詳情</a>
+                  </div>
+                </div>
+              <?php }
+            } else { ?>
+              <div class="col-md-12">
+                <p class="text-center">沒有找到符合條件的電單車。</p>
               </div>
-            </div>
-          <?php }} else { ?>
-            <div class="col-md-12">
-              <p class="text-center">沒有找到符合條件的電單車。</p>
-            </div>
-          <?php } ?>
+            <?php } ?>
+          </div>
         </div>
+        <!-- /電單車列表 -->
+
       </div>
-      <!-- /電單車列表 -->
-
     </div>
-  </div>
-</section>
-<!-- /列表區塊 -->
+  </section>
+  <!-- /列表區塊 -->
 
-<!--頁腳 -->
-<?php include('includes/footer.php');?>
-<!-- /頁腳 -->
+  <!--頁腳 -->
+  <?php include('includes/footer.php');?>
+  <!-- /頁腳 -->
 
-<!-- 回到頂部 -->
-<div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
-<!--/回到頂部 -->
+  <!-- 回到頂部 -->
+  <div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
+  <!--/回到頂部 -->
 
-<!-- 登入表單 -->
-<?php include('includes/login.php');?>
-<!--/登入表單 -->
+  <!-- 登入表單 -->
+  <?php include('includes/login.php');?>
+  <!--/登入表單 -->
 
-<!-- 註冊表單 -->
-<?php include('includes/registration.php');?>
+  <!-- 註冊表單 -->
+  <?php include('includes/registration.php');?>
 
-<!--/註冊表單 -->
+  <!--/註冊表單 -->
 
-<!-- 忘記密碼表單 -->
-<?php include('includes/forgotpassword.php');?>
-<!--/忘記密碼表單 -->
+  <!-- 忘記密碼表單 -->
+  <?php include('includes/forgotpassword.php');?>
+  <!--/忘記密碼表單 -->
 
-<!-- 腳本 -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/interface.js"></script>
-<!--Switcher-->
-<script src="assets/switcher/js/switcher.js"></script>
-<!--bootstrap-slider-JS-->
-<script src="assets/js/bootstrap-slider.min.js"></script>
-<script src="assets/js/slick.min.js"></script>
-<script src="assets/js/owl.carousel.min.js"></script>
+  <!-- 腳本 -->
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/interface.js"></script>
+  <!--Switcher-->
+  <script src="assets/switcher/js/switcher.js"></script>
+  <!--bootstrap-slider-JS-->
+  <script src="assets/js/bootstrap-slider.min.js"></script>
+  <script src="assets/js/slick.min.js"></script>
+  <script src="assets/js/owl.carousel.min.js"></script>
 </body>
+
 </html>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 06, 2025 at 11:15 AM
+-- Generation Time: Jul 12, 2025 at 02:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -114,7 +114,17 @@ INSERT INTO `tblbrands` (`id`, `BrandName`, `CreationDate`, `UpdationDate`) VALU
 (3, 'Honda', '2017-06-18 16:25:03', NULL),
 (4, 'Suzuki', '2017-06-18 16:25:13', NULL),
 (5, 'Yamaha', '2017-06-18 16:25:24', NULL),
-(7, 'Ducati', '2017-06-19 06:22:13', NULL);
+(7, 'Ducati', '2017-06-19 06:22:13', NULL),
+(8, 'Kawasaki', '2025-07-07 14:26:54', NULL),
+(9, 'BMW', '2025-07-07 14:26:54', NULL),
+(10, 'Harley-Davidson', '2025-07-07 14:26:54', NULL),
+(11, 'Vespa', '2025-07-07 14:26:54', NULL),
+(12, 'Triumph', '2025-07-07 14:26:54', NULL),
+(13, 'Aprilia', '2025-07-07 14:26:54', NULL),
+(14, 'SYM', '2025-07-07 14:26:54', NULL),
+(15, 'KYMCO', '2025-07-07 14:26:54', NULL),
+(16, 'Royal Enfield', '2025-07-07 14:26:54', NULL),
+(17, 'CFMoto', '2025-07-07 14:26:54', NULL);
 
 -- --------------------------------------------------------
 
@@ -328,7 +338,7 @@ INSERT INTO `tblvehicles` (`id`, `VehiclesTitle`, `VehiclesBrand`, `UserId`, `Bi
 (6, '1123', 3, 5, 'Naked', 'honda PCX160', 100, 'Petrol', 160, 2025, 2, 2, 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', 'honda_pcx160.png', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-24 12:23:23', '2025-07-03 16:07:20'),
 (7, 'CB400 3', 3, 5, 'Naked', '2007 has car cam', 28000, 'Petrol', 400, 2007, 2, 3, 'cb400-3.jpg', 'cb400-3-2.jpg', 'cb400-3-3.jpg', 'cb400-4.jpg', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-06-26 13:51:23', '2025-07-03 16:19:03'),
 (10, 'NINJA 300', 4, NULL, 'Sports', '??TEST', 16000, 'Petrol', 300, 2012, 2, 4, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-04 08:44:13', NULL),
-(17, 'AUGUR', 5, 2, 'Scooter', '123', 500, 'Petrol', 155, 2023, 2, 0, 'new-yamaha-augur-155cc-scooter-specs-colour-4.jpg', '', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-04 09:50:22', '2025-07-05 18:57:59'),
+(17, 'AUGUR', 5, 6, 'Scooter', '123', 500, 'Petrol', 155, 2023, 2, 0, 'new-yamaha-augur-155cc-scooter-specs-colour-4.jpg', '', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-04 09:50:22', '2025-07-10 16:19:14'),
 (18, 'NINJA 300', 4, NULL, 'Sports', 'Test 2', 10000, 'Petrol', 300, 2020, 2, 5, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-05 10:44:47', NULL),
 (19, 'NINJA 300', 4, 2, 'Sports', 'suzuki ninja 300', 300, 'Petrol', 300, 2020, 2, 4, '2013_Kawasaki_Ninja_300_Seattle_Motorcycle_Show.jpg', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-07-05 17:04:45', NULL);
 
@@ -347,6 +357,285 @@ CREATE TABLE `tblvehicle_activity_log` (
   `ActionDescription` text DEFAULT NULL,
   `ActionDate` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessories`
+--
+
+CREATE TABLE `tbl_accessories` (
+  `accessory_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `condition` varchar(50) DEFAULT NULL,
+  `image_url1` varchar(255) DEFAULT NULL,
+  `image_url2` varchar(255) DEFAULT NULL,
+  `image_url3` varchar(255) DEFAULT NULL,
+  `post_date` datetime DEFAULT current_timestamp(),
+  `last_updated` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `transaction_count` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessories`
+--
+
+INSERT INTO `tbl_accessories` (`accessory_id`, `user_id`, `title`, `description`, `price`, `condition`, `image_url1`, `image_url2`, `image_url3`, `post_date`, `last_updated`, `is_active`, `transaction_count`) VALUES
+(1, 5, '全新 Brembo M4 卡鉗', '從 Kawasaki ZX-10R 拆下，狀況良好，幾乎全新，帶剎車皮。', 3500.00, '全新', 'acc_brembo_m4_1.jpg', 'acc_brembo_m4_2.jpg', NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(2, 2, 'SHOEI GT-Air II 全罩頭盔', '尺寸 M (57-58cm)，使用約一年，無明顯刮痕，附原廠袋。', 2800.00, '二手', 'acc_shoei_gtair2_1.jpg', 'acc_shoei_gtair2_2.jpg', NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(3, 5, 'Akrapovič 碳纖維全段排氣管', '適用於 Yamaha MT-07 (2018-2022)，提升聲浪與性能，附消音塞。', 4200.00, '二手', 'acc_akrapovic_mt07_1.jpg', 'acc_akrapovic_mt07_2.jpg', NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(4, 2, 'Dainese GORE-TEX 防摔手套', '尺寸 L，冬季防風防水款，九成新，適合香港濕冷天氣。', 850.00, '二手', 'acc_dainese_gloves_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(5, 5, 'MOTUL 300V 4T 機油 1L', '全新未開封，5W-40，酯類配方，適用於高性能電單車。', 180.00, '全新', 'acc_motul300v_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(6, 2, 'GIVI 後箱 E43NTL Advanced', '容量 43 公升，附底座和靠背，可放置一頂全罩頭盔，有鎖匙。', 950.00, '二手', 'acc_givi_e43_1.jpg', 'acc_givi_e43_2.jpg', NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(7, 5, 'Ram Mounts X-Grip 手機導航支架', '通用型，適用於各種手機尺寸，安裝簡單穩固，帶防脫落綁帶。', 150.00, '全新', 'acc_ram_mount_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(8, 2, 'KTM Duke 390 原廠舒適坐墊', '2017 Duke 390 拆下，狀況良好，無破損，比原廠更舒適。', 600.00, '二手', 'acc_duke_seat_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(9, 5, 'ABUS Detecto 7000 RS1 碟煞鎖', '高強度鋼材，帶警報功能，增加安全性，內置震動傳感器。', 780.00, '全新', 'acc_abus_disc_lock_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(10, 2, '復古電單車皮革工具包', '純手工製作，掛載於車側或前叉，風格獨特，全新未用。', 480.00, '全新', 'acc_vintage_bag_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(11, 5, 'NGK Iridium 火星塞 CR9EIA-9', '全新兩支，適用於多種日系跑車，提升點火效率。', 250.00, '全新', 'acc_ngk_sparkplug_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(12, 2, 'GP-Pro 碳纖維手把', '輕量化設計，直徑22mm，適合街車改裝，小刮痕。', 700.00, '二手', 'acc_gp_pro_handlebar_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(13, 5, 'EBC Sintered 剎車皮', '全新一套，適用於Honda CB650R 前輪，高摩擦係數。', 450.00, '全新', 'acc_ebc_brakepads_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(14, 2, ' Sena 50S 藍牙通訊系統', '單機組，使用約半年，功能正常，無配件破損。', 2000.00, '二手', 'acc_sena_50s_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(15, 5, 'K&N 高流量空濾', '適用於 Yamaha R3，可重複清洗使用，提升進氣效率。', 380.00, '二手', 'acc_kn_airfilter_1.jpg', NULL, NULL, '2025-07-08 20:11:40', NULL, 1, 0),
+(16, 6, '全地形越野摩托車把手保護罩 - 碳纖維強化', '這是一款專為越野和冒險摩托車設計的碳纖維強化把手保護罩。它能有效保護您的雙手和把手控制裝置免受碎石、樹枝和其他障礙物的傷害，同時提供卓越的抗衝擊性和輕量化設計。易於安裝，適用於多種主流摩托車型號，是追求極限越野體驗騎士的理想選擇。', 580.00, 'New', 'd507981c4fc73a95b20d2525fa463b82.jpeg', '', '', '2025-07-10 00:50:34', NULL, 1, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_attributes`
+--
+
+CREATE TABLE `tbl_accessory_attributes` (
+  `attribute_id` int(11) NOT NULL,
+  `attribute_name` varchar(100) NOT NULL,
+  `attribute_type` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_attributes`
+--
+
+INSERT INTO `tbl_accessory_attributes` (`attribute_id`, `attribute_name`, `attribute_type`) VALUES
+(1, '品牌', 'text'),
+(2, '尺寸', 'text'),
+(3, '材質', 'text'),
+(4, '適用車型', 'text'),
+(5, '顏色', 'text'),
+(6, '容量', 'number'),
+(7, '類型', 'text'),
+(8, '年份', 'number'),
+(9, '保固', 'text'),
+(10, '功能', 'text');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_attribute_values`
+--
+
+CREATE TABLE `tbl_accessory_attribute_values` (
+  `id` int(11) NOT NULL,
+  `accessory_id` int(11) NOT NULL,
+  `attribute_id` int(11) NOT NULL,
+  `attribute_value` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_attribute_values`
+--
+
+INSERT INTO `tbl_accessory_attribute_values` (`id`, `accessory_id`, `attribute_id`, `attribute_value`) VALUES
+(1, 1, 1, 'Brembo'),
+(2, 1, 4, 'Kawasaki ZX-10R'),
+(3, 2, 1, 'SHOEI'),
+(4, 2, 2, 'M'),
+(5, 3, 1, 'Akrapovič'),
+(6, 3, 4, 'Yamaha MT-07'),
+(7, 4, 1, 'Dainese'),
+(8, 4, 2, 'L'),
+(9, 5, 1, 'MOTUL'),
+(10, 5, 7, '5W-40'),
+(11, 6, 1, 'GIVI'),
+(12, 6, 6, '43'),
+(13, 7, 1, 'Ram Mounts'),
+(14, 7, 7, '通用型'),
+(15, 8, 1, 'KTM'),
+(16, 8, 4, 'Duke 390'),
+(17, 9, 1, 'ABUS'),
+(18, 9, 10, '警報'),
+(19, 10, 3, '皮革'),
+(20, 10, 7, '工具包'),
+(21, 11, 1, 'NGK'),
+(22, 11, 7, 'Iridium'),
+(23, 12, 1, 'GP-Pro'),
+(24, 12, 2, '22mm'),
+(25, 13, 1, 'EBC'),
+(26, 13, 4, 'Honda CB650R'),
+(27, 14, 1, 'Sena'),
+(28, 14, 7, '藍牙通訊'),
+(29, 15, 1, 'K&N'),
+(30, 15, 4, 'Yamaha R3');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_categories`
+--
+
+CREATE TABLE `tbl_accessory_categories` (
+  `category_id` int(11) NOT NULL,
+  `category_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `creation_date` datetime DEFAULT current_timestamp(),
+  `last_updated` datetime DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_categories`
+--
+
+INSERT INTO `tbl_accessory_categories` (`category_id`, `category_name`, `description`, `creation_date`, `last_updated`) VALUES
+(1, '電單車零件', '各種用於維修、替換和升級電單車內部及外部組件的配件。', '2025-07-08 20:11:40', NULL),
+(2, '駕駛者裝備', '為電單車駕駛者提供保護、舒適和便利的個人穿戴裝備。', '2025-07-08 20:11:40', NULL),
+(3, '改裝與性能部品', '旨在提升電單車性能、操控性或個性化外觀的專業部件。', '2025-07-08 20:11:40', NULL),
+(4, '維護與清潔用品', '用於電單車日常保養、清潔和長期維護的消耗品及工具。', '2025-07-08 20:11:40', NULL),
+(5, '電氣與電子產品', '電單車上的電子設備、照明、線路及其他輔助電器。', '2025-07-08 20:11:40', NULL),
+(6, '儲物與旅行裝備', '為長短途旅行提供額外儲物空間及便利性的配件。', '2025-07-08 20:11:40', NULL),
+(7, '安全與防護配件', '除個人裝備外，額外提供電單車本身及駕駛者安全保障的產品。', '2025-07-08 20:11:40', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_category_map`
+--
+
+CREATE TABLE `tbl_accessory_category_map` (
+  `accessory_id` int(11) NOT NULL,
+  `subcategory_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_category_map`
+--
+
+INSERT INTO `tbl_accessory_category_map` (`accessory_id`, `subcategory_id`) VALUES
+(1, 2),
+(2, 8),
+(3, 15),
+(4, 11),
+(5, 21),
+(6, 31),
+(7, 27),
+(8, 5),
+(9, 36),
+(10, 32),
+(11, 1),
+(12, 19),
+(13, 2),
+(14, 27),
+(15, 16),
+(16, 11);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_contacts`
+--
+
+CREATE TABLE `tbl_accessory_contacts` (
+  `id` int(11) NOT NULL,
+  `accessory_id` int(11) NOT NULL,
+  `contact_type` varchar(50) NOT NULL,
+  `contact_value` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `creation_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_contacts`
+--
+
+INSERT INTO `tbl_accessory_contacts` (`id`, `accessory_id`, `contact_type`, `contact_value`, `description`, `creation_date`) VALUES
+(1, 1, 'Phone', '98765432', 'WhatsApp 或直接撥打', '2025-07-08 12:11:40'),
+(2, 2, 'Email', 'user2_contact@example.com', '請發送郵件查詢', '2025-07-08 12:11:40'),
+(3, 3, 'WeChat', 'akrapovic_seller', '微信詳談', '2025-07-08 12:11:40'),
+(4, 4, 'Phone', '91234567', '最好是下午聯絡', '2025-07-08 12:11:40'),
+(5, 5, 'Email', 'motul_dealer@example.com', '批量購買可議價', '2025-07-08 12:11:40'),
+(6, 6, 'Phone', '95551234', '可屯門面交', '2025-07-08 12:11:40'),
+(7, 7, 'Email', 'gadget_seller@example.com', '支援多種支付方式', '2025-07-08 12:11:40'),
+(8, 8, 'Phone', '90008888', '限自取', '2025-07-08 12:11:40'),
+(9, 9, 'WhatsApp', 'disc_lock_hk', '提供安裝指導', '2025-07-08 12:11:40'),
+(10, 10, 'Email', 'vintage_gear@example.com', '運費另計', '2025-07-08 12:11:40'),
+(11, 11, 'Phone', '97776666', '全新火星塞，一次買兩支優惠', '2025-07-08 12:11:40'),
+(12, 12, 'Email', 'bike_parts_hk@example.com', '灣仔可交收', '2025-07-08 12:11:40'),
+(13, 13, 'WhatsApp', 'brakepads_hk', '多款剎車皮可詢問', '2025-07-08 12:11:40'),
+(14, 14, 'Phone', '92221111', 'Sena 藍牙耳機，聲音清晰', '2025-07-08 12:11:40'),
+(15, 15, 'Email', 'kn_filter_shop@example.com', '定期清洗可重複使用', '2025-07-08 12:11:40'),
+(16, 16, 'WhatsApp', '91234567', '', '2025-07-09 16:50:34');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accessory_subcategories`
+--
+
+CREATE TABLE `tbl_accessory_subcategories` (
+  `subcategory_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `subcategory_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `creation_date` datetime DEFAULT current_timestamp(),
+  `last_updated` datetime DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_accessory_subcategories`
+--
+
+INSERT INTO `tbl_accessory_subcategories` (`subcategory_id`, `category_id`, `subcategory_name`, `description`, `creation_date`, `last_updated`) VALUES
+(1, 1, '引擎與傳動系統', '包括汽缸、活塞、離合器、鏈條、皮帶等關鍵動力部件。', '2025-07-08 20:11:40', NULL),
+(2, 1, '制動系統', '剎車碟盤、卡鉗、剎車油管、總泵、剎車片等。', '2025-07-08 20:11:40', NULL),
+(3, 1, '懸吊系統', '前叉、後避震器、彈簧、油封、連桿等緩衝組件。', '2025-07-08 20:11:40', NULL),
+(4, 1, '輪胎與輪圈', '各種尺寸和類型的電單車輪胎、輪框及相關配件。', '2025-07-08 20:11:40', NULL),
+(5, 1, '車架與車身零件', '車架、副車架、腳踏、側支架、後照鏡、車殼等。', '2025-07-08 20:11:40', NULL),
+(6, 1, '供油系統', '化油器、噴油嘴、燃油泵、燃油濾清器等。', '2025-07-08 20:11:40', NULL),
+(7, 1, '轉向系統', '把手、轉向軸承、轉向阻尼器。', '2025-07-08 20:11:40', NULL),
+(8, 2, '頭盔', '全罩、3/4罩、半罩、越野盔及相關配件，如風鏡。', '2025-07-08 20:11:40', NULL),
+(9, 2, '防摔衣', '皮革防摔衣、紡織防摔衣、網眼防摔衣及內襯。', '2025-07-08 20:11:40', NULL),
+(10, 2, '防摔褲', '賽車皮褲、防摔牛仔褲、紡織防摔褲。', '2025-07-08 20:11:40', NULL),
+(11, 2, '手套', '夏季手套、冬季手套、賽車手套、GORE-TEX 防水手套。', '2025-07-08 20:11:40', NULL),
+(12, 2, '車靴', '賽車靴、休閒騎行靴、防水靴。', '2025-07-08 20:11:40', NULL),
+(13, 2, '護具', '護肘、護膝、護背、頸部護具、防護背心。', '2025-07-08 20:11:40', NULL),
+(14, 2, '內襯與底層衣', '吸濕排汗內襯、保暖底層衣。', '2025-07-08 20:11:40', NULL),
+(15, 3, '排氣系統升級', '改裝消音器、全段排氣管、中段管、觸媒轉換器。', '2025-07-08 20:11:40', NULL),
+(16, 3, '動力與電控改裝', '性能空濾、改裝ECU、快速換檔器、動力指令器。', '2025-07-08 20:11:40', NULL),
+(17, 3, '燈光與視覺改裝', 'LED大燈、改裝方向燈、尾燈、整流罩、風鏡。', '2025-07-08 20:11:40', NULL),
+(18, 3, '煞車與懸吊升級', '高性能卡鉗、浮動碟盤、改裝避震器、防甩頭。', '2025-07-08 20:11:40', NULL),
+(19, 3, '輕量化與外觀件', '碳纖維部件、鋁合金腳踏後移、拉桿、把手。', '2025-07-08 20:11:40', NULL),
+(20, 3, '音響與娛樂系統', '電單車音響、藍牙喇叭。', '2025-07-08 20:11:40', NULL),
+(21, 4, '機油與潤滑劑', '引擎機油、齒輪油、剎車油、鏈條油、黃油等。', '2025-07-08 20:11:40', NULL),
+(22, 4, '清潔與保養品', '洗車精、打蠟劑、鏈條清潔劑、鍍膜產品、皮革保養劑。', '2025-07-08 20:11:40', NULL),
+(23, 4, '基礎維修工具', '扳手套組、螺絲刀套組、胎壓計、鏈條工具。', '2025-07-08 20:11:40', NULL),
+(24, 4, '駐車架與頂車機', '前輪駐車架、後輪駐車架、剪式頂車機。', '2025-07-08 20:11:40', NULL),
+(25, 4, '濾芯與耗材', '空氣濾芯、機油濾芯、燃油濾芯、火星塞。', '2025-07-08 20:11:40', NULL),
+(26, 5, '行車記錄器', '前後雙錄、單錄行車記錄器、配件。', '2025-07-08 20:11:40', NULL),
+(27, 5, '導航與通訊系統', 'GPS導航儀、藍牙通訊耳機、對講機。', '2025-07-08 20:11:40', NULL),
+(28, 5, 'USB充電與電源轉換', '電單車專用USB充電孔、點煙器插座、電源轉換器。', '2025-07-08 20:11:40', NULL),
+(29, 5, '感應器與監測', '胎壓監測系統(TPMS)、電壓表。', '2025-07-08 20:11:40', NULL),
+(30, 5, '燈光與電線', '輔助照明燈、線束、保險絲。', '2025-07-08 20:11:40', NULL),
+(31, 6, '後箱與側箱', '硬殼後箱、軟殼側箱、邊包、箱架。', '2025-07-08 20:11:40', NULL),
+(32, 6, '油箱包與尾包', '磁吸油箱包、綁帶油箱包、後座包、防水尾包。', '2025-07-08 20:11:40', NULL),
+(33, 6, '行李網與綁帶', '彈力網、行李綁帶、行李繩。', '2025-07-08 20:11:40', NULL),
+(34, 6, '防水袋與背包', '防水背包、防水行李袋、捲口包。', '2025-07-08 20:11:40', NULL),
+(35, 6, '車罩', '室內防塵車罩、室外防水防曬車罩。', '2025-07-08 20:11:40', NULL),
+(36, 7, '防盜系統', '碟煞鎖、鏈條鎖、警報器、GPS追蹤器。', '2025-07-08 20:11:40', NULL),
+(37, 7, '防摔球與保險桿', '引擎防摔球、車身保險桿、水箱護網。', '2025-07-08 20:11:40', NULL),
+(38, 7, '胎壓監測系統', '胎內式、胎外式胎壓監測器。', '2025-07-08 20:11:40', NULL),
+(39, 7, '輔助照明與警示', '輔助霧燈、高亮度方向燈、爆閃尾燈。', '2025-07-08 20:11:40', NULL),
+(40, 7, '緊急救援用品', '補胎工具、急救包。', '2025-07-08 20:11:40', NULL);
 
 --
 -- Indexes for dumped tables
@@ -436,6 +725,57 @@ ALTER TABLE `tblvehicle_activity_log`
   ADD KEY `AdminId` (`AdminId`);
 
 --
+-- Indexes for table `tbl_accessories`
+--
+ALTER TABLE `tbl_accessories`
+  ADD PRIMARY KEY (`accessory_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `tbl_accessory_attributes`
+--
+ALTER TABLE `tbl_accessory_attributes`
+  ADD PRIMARY KEY (`attribute_id`),
+  ADD UNIQUE KEY `attribute_name` (`attribute_name`);
+
+--
+-- Indexes for table `tbl_accessory_attribute_values`
+--
+ALTER TABLE `tbl_accessory_attribute_values`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `idx_accessory_attribute_unique` (`accessory_id`,`attribute_id`),
+  ADD KEY `attribute_id` (`attribute_id`);
+
+--
+-- Indexes for table `tbl_accessory_categories`
+--
+ALTER TABLE `tbl_accessory_categories`
+  ADD PRIMARY KEY (`category_id`),
+  ADD UNIQUE KEY `category_name` (`category_name`);
+
+--
+-- Indexes for table `tbl_accessory_category_map`
+--
+ALTER TABLE `tbl_accessory_category_map`
+  ADD PRIMARY KEY (`accessory_id`,`subcategory_id`),
+  ADD KEY `subcategory_id` (`subcategory_id`);
+
+--
+-- Indexes for table `tbl_accessory_contacts`
+--
+ALTER TABLE `tbl_accessory_contacts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `accessory_id` (`accessory_id`);
+
+--
+-- Indexes for table `tbl_accessory_subcategories`
+--
+ALTER TABLE `tbl_accessory_subcategories`
+  ADD PRIMARY KEY (`subcategory_id`),
+  ADD UNIQUE KEY `subcategory_name` (`subcategory_name`),
+  ADD KEY `category_id` (`category_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -461,7 +801,7 @@ ALTER TABLE `tblbooking`
 -- AUTO_INCREMENT for table `tblbrands`
 --
 ALTER TABLE `tblbrands`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tblcontactusinfo`
@@ -509,13 +849,49 @@ ALTER TABLE `tbluser_contacts`
 -- AUTO_INCREMENT for table `tblvehicles`
 --
 ALTER TABLE `tblvehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `tblvehicle_activity_log`
 --
 ALTER TABLE `tblvehicle_activity_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessories`
+--
+ALTER TABLE `tbl_accessories`
+  MODIFY `accessory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessory_attributes`
+--
+ALTER TABLE `tbl_accessory_attributes`
+  MODIFY `attribute_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessory_attribute_values`
+--
+ALTER TABLE `tbl_accessory_attribute_values`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessory_categories`
+--
+ALTER TABLE `tbl_accessory_categories`
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessory_contacts`
+--
+ALTER TABLE `tbl_accessory_contacts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `tbl_accessory_subcategories`
+--
+ALTER TABLE `tbl_accessory_subcategories`
+  MODIFY `subcategory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- Constraints for dumped tables
@@ -540,6 +916,38 @@ ALTER TABLE `tblvehicle_activity_log`
   ADD CONSTRAINT `tblvehicle_activity_log_ibfk_1` FOREIGN KEY (`VehicleId`) REFERENCES `tblvehicles` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `tblvehicle_activity_log_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `tblusers` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `tblvehicle_activity_log_ibfk_3` FOREIGN KEY (`AdminId`) REFERENCES `admin` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `tbl_accessories`
+--
+ALTER TABLE `tbl_accessories`
+  ADD CONSTRAINT `tbl_accessories_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `tblusers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_accessory_attribute_values`
+--
+ALTER TABLE `tbl_accessory_attribute_values`
+  ADD CONSTRAINT `tbl_accessory_attribute_values_ibfk_1` FOREIGN KEY (`accessory_id`) REFERENCES `tbl_accessories` (`accessory_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tbl_accessory_attribute_values_ibfk_2` FOREIGN KEY (`attribute_id`) REFERENCES `tbl_accessory_attributes` (`attribute_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_accessory_category_map`
+--
+ALTER TABLE `tbl_accessory_category_map`
+  ADD CONSTRAINT `tbl_accessory_category_map_ibfk_1` FOREIGN KEY (`accessory_id`) REFERENCES `tbl_accessories` (`accessory_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tbl_accessory_category_map_ibfk_2` FOREIGN KEY (`subcategory_id`) REFERENCES `tbl_accessory_subcategories` (`subcategory_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_accessory_contacts`
+--
+ALTER TABLE `tbl_accessory_contacts`
+  ADD CONSTRAINT `tbl_accessory_contacts_ibfk_1` FOREIGN KEY (`accessory_id`) REFERENCES `tbl_accessories` (`accessory_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_accessory_subcategories`
+--
+ALTER TABLE `tbl_accessory_subcategories`
+  ADD CONSTRAINT `tbl_accessory_subcategories_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `tbl_accessory_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
